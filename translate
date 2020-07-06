@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [ -z $1 ] ; then
+    EXEC=`basename "$0"`
+    echo "Usage: ./$EXEC \$URL_TO_SURGE_CONFIG" && exit 1;
+fi
+curl -s $1 | grep "= trojan,"
