@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [ -z $1 ] ; then
+    EXEC=`basename "$0"`
+    echo "Usage: ./$EXEC \$SURGE_CONFIG_FILE" && exit 1;
+fi
+echo "https://raw.githubusercontent.com/leonmax/rules/master/$1" | tee >(pbcopy)
