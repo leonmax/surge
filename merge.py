@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-from datetime import datetime
-from shutil import copyfile
-from pathlib import Path
 import os
 import re
 import argparse
@@ -66,8 +63,7 @@ class SurgeProfile:
         return self._section_names
 
 
-def merge(source1: str, source2: str, target: str, backup: str):
-
+def merge(source1: str, source2: str, target: str):
     print(f'Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
     print(f'Loading from "{source2}"')
@@ -81,11 +77,6 @@ def merge(source1: str, source2: str, target: str, backup: str):
             lines = profile2.get_section(section_name)
             profile1.prepend_to_section(section_name, lines)
 
-    if not backup:
-        backup = datetime.today().strftime('backup/%Y-%m-%d.conf')
-    print(f"Backing up {target} to {backup}")
-    copyfile(target, backup)
-
     print(f"Saving to {target}")
     profile1.remove_managed_line()
     profile1.save(as_file=target)
@@ -94,11 +85,10 @@ def merge(source1: str, source2: str, target: str, backup: str):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("source1", nargs='?', default="Dler Cloud (Yujing).conf")
-    parser.add_argument("source2", nargs='?', default="rules/merge.conf")
-    parser.add_argument("target", nargs='?', default="Yangming.conf")
-    parser.add_argument("backup", nargs='?')
+    parser.add_argument("source2", nargs='?', default="rules/customized.conf")
+    parser.add_argument("target", nargs='?', default="merged.conf")
     args = parser.parse_args()
 
     target = args.target or args.source2
-    merge(args.source1, args.source2, target, args.backup)
+    merge(args.source1, args.source2, target)
 
