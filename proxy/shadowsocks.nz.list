@@ -6,6 +6,10 @@
 香港-HK1-6-Rate:0.5 = trojan, hk1-6.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 香港-HK1-7-Rate:0.5 = trojan, hk1-7.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 香港-HK1-8-Rate:0.5 = trojan, hk1-8.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
+澳大利亚-AU2-1-Rate:1.0 = trojan, au2-1.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
+澳大利亚-AU2-2-Rate:1.0 = trojan, au2-2.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
+澳大利亚-AU2-3-Rate:1.0 = trojan, au2-3.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
+澳大利亚-AU2-4-Rate:1.0 = trojan, au2-4.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 德国-DE1-1-Rate:1.0 = trojan, de1-1.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 德国-DE1-2-Rate:1.0 = trojan, de1-2.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 德国-DE1-3-Rate:1.0 = trojan, de1-3.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
@@ -34,10 +38,6 @@
 美国-US3-6-Rate:1.0 = trojan, us3-6.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 美国-US3-7-Rate:1.0 = trojan, us3-7.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 美国-US3-8-Rate:1.0 = trojan, us3-8.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-台湾-TW1-1-Rate:0.5 = trojan, tw1-1.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-台湾-TW1-2-Rate:0.5 = trojan, tw1-2.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-台湾-TW1-3-Rate:0.5 = trojan, tw1-3.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-台湾-TW1-4-Rate:0.5 = trojan, tw1-4.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 日本-TY1-1-Rate:1.0 = trojan, ty1-1.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 日本-TY1-2-Rate:1.0 = trojan, ty1-2.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 日本-TY1-3-Rate:1.0 = trojan, ty1-3.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
@@ -86,10 +86,6 @@
 英国-UK1-2-Rate:1.0 = trojan, uk1-2.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 英国-UK1-3-Rate:1.0 = trojan, uk1-3.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 英国-UK1-4-Rate:1.0 = trojan, uk1-4.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-澳大利亚-AU1-1-Rate:1.0 = trojan, au1-1.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-澳大利亚-AU1-2-Rate:1.0 = trojan, au1-2.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-澳大利亚-AU1-3-Rate:1.0 = trojan, au1-3.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
-澳大利亚-AU1-4-Rate:1.0 = trojan, au1-4.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 美国-V6-1-Rate:1.0 = trojan, v6-1.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 日本-V6-2-Rate:1.0 = trojan, v6-2.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
 香港-V6-3-Rate:0.5 = trojan, v6-3.nigirocloud.com, 443, password=797nKDKCapDAAwXFtm
