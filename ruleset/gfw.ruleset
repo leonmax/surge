@@ -1,4 +1,13 @@
+# blogger
 DOMAIN,anthology.leonmax.com
+DOMAIN,blog.leonmax.com
+# manhuaren
+USER-AGENT,CaricatureManGroup
+USER-AGENT,yingqiDm
+USER-AGENT,manhuaren*
+DOMAIN-KEYWORD,manhuaren
+DOMAIN,bi.manhuaren.com
+# global
 DOMAIN-SUFFIX,github.com
 DOMAIN-SUFFIX,licdn.com
 DOMAIN-SUFFIX,linkedin.com
