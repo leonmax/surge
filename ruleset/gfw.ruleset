@@ -7,6 +7,11 @@ USER-AGENT,yingqiDm
 USER-AGENT,manhuaren*
 DOMAIN-KEYWORD,manhuaren
 DOMAIN,bi.manhuaren.com
+# app
+PROCESS-NAME,OneDrive
+PROCESS-NAME,zoom.us
+PROCESS-NAME,Microsoft Teams Helper
+PROCESS-NAME,Slack Helper
 # global
 DOMAIN-SUFFIX,github.com
 DOMAIN-SUFFIX,licdn.com

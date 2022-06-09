@@ -73,7 +73,7 @@ def merge(source1: str, source2: str, target: str):
         if section_name:
             len1 = len(profile1.get_section(section_name))
             len2 = len(profile2.get_section(section_name))
-            print(f"Merging section {section_name}: {len1} + {len2} => {len1+len2}")
+            print(f"Merging section [{section_name}]: {len1} + {len2} => {len1+len2}")
             lines = profile2.get_section(section_name)
             profile1.prepend_to_section(section_name, lines)
 
