@@ -84,7 +84,7 @@ def merge(source1: str, source2: str, target: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("source1", nargs='?', default="Dler Cloud (Yujing).conf")
+    parser.add_argument("source1", nargs='?', default="Dler Cloud.conf")
     parser.add_argument("source2", nargs='?', default="rules/customized.conf")
     parser.add_argument("target", nargs='?', default="merged.conf")
     args = parser.parse_args()
