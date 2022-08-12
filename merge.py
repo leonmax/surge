@@ -2,6 +2,36 @@
 import os
 import re
 import argparse
+from dataclasses import dataclass
+import urllib.request
+
+
+@dataclass
+class ManagedProfile:
+    url: str
+    interval: int = 86400  # well we basically ignored that
+    strict: bool = False   # well we basically ignored that
+
+    def download(self, filename):
+        urllib.request.urlretrieve(self.url, filename)
+
+    @staticmethod
+    def reload(filename):
+        with open(filename, "r") as f:
+            line = f.readline()
+            if not line.startswith("#!MANAGED-CONFIG"):
+                raise Exception("Not a managed config!")
+
+        values = line.split(" ")
+        profile = ManagedProfile(url=values[1])
+        for kv in values[2:]:
+            k, v = kv.split("=")
+            if k == "interval":
+                profile.interval = int(v)
+            if k == "strict":
+                profile.strict = bool(v)
+        print(f"Downloading managed config from {profile.url}")
+        profile.download(filename)
 
 
 class SurgeProfile:
@@ -9,7 +39,7 @@ class SurgeProfile:
         self._file = file
         self._section_names = []
         self._sections = {}
-        self._maanaged_config = None
+        self._managed_config = None
         self.load()
 
     def load(self):
@@ -56,7 +86,7 @@ class SurgeProfile:
             self._section_names.append(section_name)
             self._sections[section_name] = lines
         else:
-            self._sections[section_name][0:0] = ["#region: Leonmax\n"] + lines + ["#endregion: Leonmax\n"]
+            self._sections[section_name][0:0] = ["#region: Customized\n"] + lines + ["#endregion: Customized\n"]
 
     @property
     def section_names(self):
@@ -64,6 +94,7 @@ class SurgeProfile:
 
 
 def merge(source1: str, source2: str, target: str):
+    ManagedProfile.reload(source1)
     print(f'Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
     print(f'Loading from "{source2}"')
