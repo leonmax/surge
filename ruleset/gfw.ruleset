@@ -1,6 +1,8 @@
 # blogger
 DOMAIN,anthology.leonmax.com
 DOMAIN,blog.leonmax.com
+DOMAIN-SUFFIX,coscene.io
+DOMAIN-SUFFIX,coscene.dev
 # manhuaren
 USER-AGENT,CaricatureManGroup
 USER-AGENT,yingqiDm
