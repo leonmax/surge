@@ -1,16 +1,20 @@
 #!/usr/bin/env python
+import argparse
 import os
 import re
-import argparse
-from dataclasses import dataclass
+import time
 import urllib.request
+from dataclasses import dataclass
+from pathlib import Path
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 @dataclass
 class ManagedProfile:
     url: str
-    interval: int = 86400  # well we basically ignored that
-    strict: bool = False   # well we basically ignored that
+    interval: int = 86400  # How often the profile is updated.
+    strict: bool = False  # well we basically ignored that
 
     def download(self, filename):
         urllib.request.urlretrieve(self.url, filename)
@@ -30,8 +34,10 @@ class ManagedProfile:
                 profile.interval = int(v)
             if k == "strict":
                 profile.strict = bool(v)
-        print(f"Downloading managed config from {profile.url}")
-        profile.download(filename)
+
+        if time.time() > Path(filename).stat().st_mtime + profile.interval:
+            print(f"Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
+            profile.download(filename)
 
 
 class SurgeProfile:
@@ -48,19 +54,19 @@ class SurgeProfile:
         cur = []
         self._section_names.append("")
         self._sections[""] = cur
-        for l in lines:
-            if l.startswith("#!MANAGED-CONFIG"):
-                self._managed_config = l
+        for line in lines:
+            if line.startswith("#!MANAGED-CONFIG"):
+                self._managed_config = line
                 continue
-            m = re.match("\[(.*)\]\n", l)
+            m = re.match(r"\[(.*)]\n", line)
             if m:
                 section_name = m.group(1)
                 cur = []
                 self._section_names.append(section_name)
                 self._sections[section_name] = cur
             else:
-                l = l if l.endswith("\n") else l + "\n"
-                cur.append(l)
+                line = line if line.endswith("\n") else line + "\n"
+                cur.append(line)
 
     def remove_managed_line(self):
         self._managed_config = None
@@ -75,7 +81,7 @@ class SurgeProfile:
                 if section_name:
                     f.write(f"[{section_name}]\n")
                 lines = self.get_section(section_name)
-                #print(f"Writing section {section_name}: {len(lines)}")
+                # print(f"Writing section {section_name}: {len(lines)}")
                 f.writelines(lines)
 
     def get_section(self, section_name):
@@ -104,7 +110,7 @@ def merge(source1: str, source2: str, target: str):
         if section_name:
             len1 = len(profile1.get_section(section_name))
             len2 = len(profile2.get_section(section_name))
-            print(f"Merging section [{section_name}]: {len1} + {len2} => {len1+len2}")
+            print(f"Merging section [{section_name}]: {len1} + {len2} => {len1 + len2}")
             lines = profile2.get_section(section_name)
             profile1.prepend_to_section(section_name, lines)
 
@@ -113,13 +119,16 @@ def merge(source1: str, source2: str, target: str):
     profile1.save(as_file=target)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("source1", nargs='?', default="backup/Dler Cloud.conf")
-    parser.add_argument("source2", nargs='?', default="rules/customized.conf")
-    parser.add_argument("target", nargs='?', default="rules/merged.conf")
+    parser.add_argument("source2", nargs='?', default=f"{dir_path}/customized.conf")
+    parser.add_argument("-t", "--target", nargs='?', default=f"{dir_path}/merged.conf")
     args = parser.parse_args()
 
     target = args.target or args.source2
     merge(args.source1, args.source2, target)
 
+
+if __name__ == "__main__":
+    main()
