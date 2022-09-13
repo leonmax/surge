@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import argparse
+import dataclasses
+import json
 import os
 import re
 import time
@@ -116,18 +118,52 @@ def merge(source1: str, source2: str, target: str):
 
     print(f"Saving to {target}")
     profile1.remove_managed_line()
-    profile1.save(as_file=target)
+    profile1.save(as_file=f"{dir_path}/merged.conf")
+
+
+def get_path_from_user(path_name):
+    p = None
+    while not p or not os.path.exists(p):
+        p = input(f"Please input a valid {path_name}:")
+    return p
+
+
+@dataclass
+class Config:
+    source1: str
+    source2: str
+    target: str
+
+
+def configure(args):
+    if not args.conf_file.exists():
+        conf = Config(
+            source1=args.source1 or get_path_from_user("source config 1"),
+            source2=args.source2 or get_path_from_user("source config 2"),
+            target=args.target or get_path_from_user("target config"))
+        print(f"Saving config to {args.conf_file}")
+        with args.conf_file.open("w") as fp:
+            json.dump(dataclasses.asdict(conf), fp)
+    else:
+        with args.conf_file.open("r") as fp:
+            conf = Config(**json.load(fp))
+    return conf
 
 
 def main():
+    conf_path = Path(os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) / "nssurge"
+    os.makedirs(conf_path, exist_ok=True)
+    conf_file = conf_path / "config.json"
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("source1", nargs='?', default="backup/Dler Cloud.conf")
+    parser.add_argument("source1", nargs='?', default=f"{dir_path}/surge/dler.cloud.conf")
     parser.add_argument("source2", nargs='?', default=f"{dir_path}/customized.conf")
     parser.add_argument("-t", "--target", nargs='?', default=f"{dir_path}/merged.conf")
+    parser.add_argument("-c", "--conf_file", nargs='?', default=conf_file)
     args = parser.parse_args()
 
-    target = args.target or args.source2
-    merge(args.source1, args.source2, target)
+    conf = configure(args)
+    merge(conf.source1, conf.source2, conf.target)
 
 
 if __name__ == "__main__":
