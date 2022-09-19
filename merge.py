@@ -118,13 +118,15 @@ def merge(source1: str, source2: str, target: str):
 
     print(f"Saving to {target}")
     profile1.remove_managed_line()
-    profile1.save(as_file=f"{dir_path}/merged.conf")
+    profile1.save(as_file=target)
 
 
-def get_path_from_user(path_name):
+def get_path_from_user(path_name, default_path=None):
     p = None
     while not p or not os.path.exists(p):
-        p = input(f"Please input a valid {path_name}:")
+        p = input(f"Please input a valid {path_name} [{default_path}]:")
+        if not p:
+            p = default_path
     return p
 
 
@@ -137,28 +139,36 @@ class Config:
 
 def configure(args):
     if not args.conf_file.exists():
+        print(f"No config ({args.conf_file}) exists, let's configure")
         conf = Config(
-            source1=args.source1 or get_path_from_user("source config 1"),
-            source2=args.source2 or get_path_from_user("source config 2"),
-            target=args.target or get_path_from_user("target config"))
+            source1=args.source1 or get_path_from_user("source config 1", default_path=f"{dir_path}/profiles/managed/managed_profile.conf"),
+            source2=args.source2 or get_path_from_user("source config 2", default_path=f"{dir_path}/profiles/customized.conf"),
+            target=args.target or get_path_from_user("target config", default_path=f"{dir_path}/profiles/merged.conf"))
         print(f"Saving config to {args.conf_file}")
         with args.conf_file.open("w") as fp:
             json.dump(dataclasses.asdict(conf), fp)
     else:
         with args.conf_file.open("r") as fp:
             conf = Config(**json.load(fp))
+        conf = Config(
+            source1=args.source1 or conf.source1,
+            source2=args.source2 or conf.source2,
+            target=args.target or conf.target)
     return conf
+    
+def default_conf_file():
+    conf_path = Path(os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) / "nssurge"
+    os.makedirs(conf_path, exist_ok=True)
+    return conf_path / "config.json"
 
 
 def main():
-    conf_path = Path(os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) / "nssurge"
-    os.makedirs(conf_path, exist_ok=True)
-    conf_file = conf_path / "config.json"
+    conf_file = default_conf_file()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("source1", nargs='?', default=f"{dir_path}/surge/dler.cloud.conf")
-    parser.add_argument("source2", nargs='?', default=f"{dir_path}/customized.conf")
-    parser.add_argument("-t", "--target", nargs='?', default=f"{dir_path}/merged.conf")
+    parser.add_argument("source1", nargs='?')
+    parser.add_argument("source2", nargs='?')
+    parser.add_argument("-t", "--target", nargs='?')
     parser.add_argument("-c", "--conf_file", nargs='?', default=conf_file)
     args = parser.parse_args()
 
