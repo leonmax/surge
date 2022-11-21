@@ -25,6 +25,7 @@ By default, the merge command will merge `managed/managed_profile.conf ` with `c
 
 ```shell
 > ./merge.py
+> cp profiles/merged.conf ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/merged.conf
 ```
 
 
@@ -35,5 +36,4 @@ make a hard link of the merged file to wherever you sync your surge config to, s
 
 ```shell
 ln ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/backup/Dler\ Cloud.conf profiles/managed/managed_profile.conf
-ln ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/merged.conf profiles/merged.conf
 ```
