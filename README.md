@@ -21,19 +21,19 @@ options:
   -c [CONF_FILE], --conf_file [CONF_FILE]
 ```
 
+After running the first time, a config file will be generated under `$XDG_CONFIG_HOME/nssurge/config.json`, so that you don't have to type sources and target if they remain the same. An example is like below:
+
+```json
+{
+  "source1": "/path_to_this_repo/profiles/managed/managed_profile.conf",
+  "source2": "/path_to_this_repo/profiles/customized.conf",
+  "target": "/path_to_this_repo/profiles/merged.conf"
+}
+```
+
 By default, the merge command will merge `managed/managed_profile.conf ` with `conf/customized.conf`, and save the result to `conf/merged.conf`.
 
 ```shell
 > ./merge.py
 > cp profiles/merged.conf ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/merged.conf
-```
-
-
-
-## Add hard link
-
-make a hard link of the merged file to wherever you sync your surge config to, so that it can also be used anywhere this repo is not present (such as on your iOS devices)
-
-```shell
-ln ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/backup/Dler\ Cloud.conf profiles/managed/managed_profile.conf
 ```
