@@ -94,7 +94,7 @@ class SurgeProfile:
             self._section_names.append(section_name)
             self._sections[section_name] = lines
         else:
-            self._sections[section_name][0:0] = ["#region: Customized\n"] + lines + ["#endregion: Customized\n"]
+            self._sections[section_name][0:0] = ["# region: Customized\n"] + lines + ["# endregion: Customized\n"]
 
     @property
     def section_names(self):
