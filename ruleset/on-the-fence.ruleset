@@ -1,0 +1,11 @@
+PROCESS-NAME,1Password
+
+DOMAIN-SUFFIX,telestream.net
+DOMAIN-SUFFIX,logitech.com
+DOMAIN-SUFFIX,notion.so
+DOMAIN-SUFFIX,sentry.io
+DOMAIN-SUFFIX,grammarly.com
+DOMAIN-SUFFIX,algolianet.com // atlassian insights
+DOMAIN-SUFFIX,atl-paas.net // atlassian paas
+DOMAIN-SUFFIX,atlassian.net
+DOMAIN-SUFFIX,culturedcode.com // Things
