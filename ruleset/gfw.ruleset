@@ -15,6 +15,10 @@ PROCESS-NAME,zoom.us
 PROCESS-NAME,Microsoft Teams Helper
 PROCESS-NAME,Slack Helper
 # global
+DOMAIN-SUFFIX,discourse-cdn.com,Switch
+DOMAIN-SUFFIX,ghcr.io,Switch
+DOMAIN-SUFFIX,dropbox.com,Switch
+DOMAIN-SUFFIX,dropboxapi.com,Switch
 DOMAIN-SUFFIX,github.com
 DOMAIN-SUFFIX,licdn.com
 DOMAIN-SUFFIX,linkedin.com
