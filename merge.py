@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import argparse
 import dataclasses
+from datetime import datetime
 import json
 import os
 import re
+import shutil
 import time
 import urllib.request
 from dataclasses import dataclass
@@ -26,7 +28,7 @@ class ManagedProfile:
         with open(filename, "r") as f:
             line = f.readline()
             if not line.startswith("#!MANAGED-CONFIG"):
-                raise Exception("Not a managed config!")
+                raise Exception(f"⚠️  {filename} is not a managed config!")
 
         values = line.split(" ")
         profile = ManagedProfile(url=values[1])
@@ -38,7 +40,7 @@ class ManagedProfile:
                 profile.strict = bool(v)
 
         if time.time() > Path(filename).stat().st_mtime + profile.interval:
-            print(f"Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
+            print(f"ℹ️  Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
             profile.download(filename)
 
 
@@ -74,8 +76,8 @@ class SurgeProfile:
         self._managed_config = None
 
     def save(self, as_file=None):
-        file = as_file or self._file
-        with open(file, "w+") as f:
+        _file = as_file or self._file
+        with open(_file, "w+") as f:
             if self._managed_config:
                 f.write(self._managed_config)
 
@@ -83,7 +85,7 @@ class SurgeProfile:
                 if section_name:
                     f.write(f"[{section_name}]\n")
                 lines = self.get_section(section_name)
-                # print(f"Writing section {section_name}: {len(lines)}")
+                # print(f"ℹ️  Writing section {section_name}: {len(lines)}")
                 f.writelines(lines)
 
     def get_section(self, section_name):
@@ -103,20 +105,20 @@ class SurgeProfile:
 
 def merge(source1: str, source2: str, target: str):
     ManagedProfile.reload(source1)
-    print(f'Loading from "{source1}"')
+    print(f'ℹ️  Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
-    print(f'Loading from "{source2}"')
+    print(f'ℹ️  Loading from "{source2}"')
     profile2 = SurgeProfile(source2)
 
     for section_name in profile2.section_names:
         if section_name:
             len1 = len(profile1.get_section(section_name))
             len2 = len(profile2.get_section(section_name))
-            print(f"Merging section [{section_name}]: {len1} + {len2} => {len1 + len2}")
+            print(f"ℹ️  Merging section [{section_name}]: {len1} + {len2} => {len1 + len2}")
             lines = profile2.get_section(section_name)
             profile1.prepend_to_section(section_name, lines)
 
-    print(f"Saving to {target}")
+    print(f"ℹ️  Saving to {target}")
     profile1.remove_managed_line()
     profile1.save(as_file=target)
 
@@ -124,10 +126,20 @@ def merge(source1: str, source2: str, target: str):
 def get_path_from_user(path_name, default_path=None):
     p = None
     while not p or not os.path.exists(p):
-        p = input(f"Please input a valid {path_name} [{default_path}]:")
+        p = input(f"⌨️  Please input a valid {path_name} [{default_path}]:")
         if not p:
             p = default_path
     return p
+
+
+def backup(original_path):
+    os.makedirs(f"{dir_path}/profiles/backup/", exist_ok=True)
+    filename = datetime.now().strftime("bk-%Y-%m-%d.conf")
+    backup_path = f"{dir_path}/profiles/backup/{filename}"
+    
+    print(f"ℹ️  Backing up {original_path} to {backup_path}")
+    if os.path.exists(original_path):
+        shutil.copyfile(original_path, backup_path, follow_symlinks=True)
 
 
 @dataclass
@@ -139,14 +151,19 @@ class Config:
 
 def configure(args):
     if not args.conf_file.exists():
-        print(f"No config ({args.conf_file}) exists, let's configure")
+        print(f"ℹ️  No config ({args.conf_file}) exists, let's configure")
         conf = Config(
             source1=args.source1 or get_path_from_user("source config 1", default_path=f"{dir_path}/profiles/managed/managed_profile.conf"),
             source2=args.source2 or get_path_from_user("source config 2", default_path=f"{dir_path}/profiles/customized.conf"),
-            target=args.target or get_path_from_user("target config", default_path=f"{dir_path}/profiles/merged.conf"))
-        print(f"Saving config to {args.conf_file}")
+            target=args.target or get_path_from_user(
+                "target config",
+                default_path=str(Path('~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents').expanduser() / "merged.conf")
+            )
+        )
+            
+        print(f"ℹ️  Saving config to {args.conf_file}")
         with args.conf_file.open("w") as fp:
-            json.dump(dataclasses.asdict(conf), fp)
+            json.dump(dataclasses.asdict(conf), fp, indent=2)
     else:
         with args.conf_file.open("r") as fp:
             conf = Config(**json.load(fp))
@@ -155,7 +172,8 @@ def configure(args):
             source2=args.source2 or conf.source2,
             target=args.target or conf.target)
     return conf
-    
+
+
 def default_conf_file():
     conf_path = Path(os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) / "nssurge"
     os.makedirs(conf_path, exist_ok=True)
@@ -173,6 +191,7 @@ def main():
     args = parser.parse_args()
 
     conf = configure(args)
+    backup(conf.target)
     merge(conf.source1, conf.source2, conf.target)
 
 
