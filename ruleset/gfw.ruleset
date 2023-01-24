@@ -15,6 +15,8 @@ PROCESS-NAME,zoom.us
 PROCESS-NAME,Microsoft Teams Helper
 PROCESS-NAME,Slack Helper
 # global
+DOMAIN-SUFFIX,shellhacks.com
+DOMAIN-SUFFIX,python.org
 DOMAIN-SUFFIX,drupal.org
 DOMAIN-SUFFIX,discourse-cdn.com
 DOMAIN-SUFFIX,ghcr.io
