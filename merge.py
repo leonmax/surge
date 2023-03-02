@@ -24,7 +24,7 @@ class ManagedProfile:
         urllib.request.urlretrieve(self.url, filename)
 
     @staticmethod
-    def reload(filename):
+    def reload(filename, force_update=False):
         with open(filename, "r") as f:
             line = f.readline()
             if not line.startswith("#!MANAGED-CONFIG"):
@@ -39,7 +39,10 @@ class ManagedProfile:
             if k == "strict":
                 profile.strict = bool(v)
 
-        if time.time() > Path(filename).stat().st_mtime + profile.interval:
+        if force_update:
+            print(f"ℹ️  Downloading managed config from {profile.url}. It's forced.")
+            profile.download(filename)
+        elif time.time() > Path(filename).stat().st_mtime + profile.interval:
             print(f"ℹ️  Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
             profile.download(filename)
 
@@ -103,8 +106,8 @@ class SurgeProfile:
         return self._section_names
 
 
-def merge(source1: str, source2: str, target: str):
-    ManagedProfile.reload(source1)
+def merge(source1: str, source2: str, target: str, force_update: bool=False):
+    ManagedProfile.reload(source1, force_update)
     print(f'ℹ️  Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
     print(f'ℹ️  Loading from "{source2}"')
@@ -136,7 +139,7 @@ def backup(original_path):
     os.makedirs(f"{dir_path}/profiles/backup/", exist_ok=True)
     filename = datetime.now().strftime("bk-%Y-%m-%d.conf")
     backup_path = f"{dir_path}/profiles/backup/{filename}"
-    
+
     print(f"ℹ️  Backing up {original_path} to {backup_path}")
     if os.path.exists(original_path):
         shutil.copyfile(original_path, backup_path, follow_symlinks=True)
@@ -160,7 +163,7 @@ def configure(args):
                 default_path=str(Path('~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents').expanduser() / "merged.conf")
             )
         )
-            
+
         print(f"ℹ️  Saving config to {args.conf_file}")
         with args.conf_file.open("w") as fp:
             json.dump(dataclasses.asdict(conf), fp, indent=2)
@@ -188,11 +191,12 @@ def main():
     parser.add_argument("source2", nargs='?')
     parser.add_argument("-t", "--target", nargs='?')
     parser.add_argument("-c", "--conf_file", nargs='?', default=conf_file)
+    parser.add_argument("-f", "--force_update", action="store_true")
     args = parser.parse_args()
 
     conf = configure(args)
     backup(conf.target)
-    merge(conf.source1, conf.source2, conf.target)
+    merge(conf.source1, conf.source2, conf.target, args.force_update)
 
 
 if __name__ == "__main__":
