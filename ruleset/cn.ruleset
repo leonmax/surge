@@ -13,6 +13,5 @@ DOMAIN-SUFFIX,qlogo.cn
 DOMAIN-SUFFIX,myqcloud.com
 DOMAIN-SUFFIX,servicewechat.com
 DOMAIN-SUFFIX,haokanmingpian.com
-PROCESS-NAME,ssh
 PROCESS-NAME,v2ray
 PROCESS-NAME,QQLive
