@@ -1,3 +1,2 @@
-managed/
-backup/
+bk-*
 !bin/

@@ -11,7 +11,8 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+SURGE_DIR = os.path.expanduser('~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents')
 
 
 @dataclass
@@ -106,7 +107,7 @@ class SurgeProfile:
         return self._section_names
 
 
-def merge(source1: str, source2: str, target: str, force_update: bool=False):
+def merge(source1: str, source2: str, target: str, force_update: bool = False):
     ManagedProfile.reload(source1, force_update)
     print(f'ℹ️  Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
@@ -126,19 +127,20 @@ def merge(source1: str, source2: str, target: str, force_update: bool=False):
     profile1.save(as_file=target)
 
 
-def get_path_from_user(path_name, default_path=None):
+def get_path_from_user(path_name: str, default_path: str = None) -> str:
     p = None
     while not p or not os.path.exists(p):
         p = input(f"⌨️  Please input a valid {path_name} [{default_path}]:")
         if not p:
             p = default_path
+        p = os.path.expanduser(p)
     return p
 
 
 def backup(original_path):
-    os.makedirs(f"{dir_path}/profiles/backup/", exist_ok=True)
     filename = datetime.now().strftime("bk-%Y-%m-%d.conf")
-    backup_path = f"{dir_path}/profiles/backup/{filename}"
+    backup_path = Path(CURRENT_DIR) / 'profiles' / filename
+    backup_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"ℹ️  Backing up {original_path} to {backup_path}")
     if os.path.exists(original_path):
@@ -155,13 +157,14 @@ class Config:
 def configure(args):
     if not args.conf_file.exists():
         print(f"ℹ️  No config ({args.conf_file}) exists, let's configure")
+
         conf = Config(
-            source1=args.source1 or get_path_from_user("source config 1", default_path=f"{dir_path}/profiles/managed/managed_profile.conf"),
-            source2=args.source2 or get_path_from_user("source config 2", default_path=f"{dir_path}/profiles/customized.conf"),
+            source1=args.source1 or get_path_from_user(
+                "source config 1", default_path=f"{ SURGE_DIR }/subs/Dler Cloud.conf"),
+            source2=args.source2 or get_path_from_user(
+                "source config 2", default_path=f"{ CURRENT_DIR }/customized.patch"),
             target=args.target or get_path_from_user(
-                "target config",
-                default_path=str(Path('~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents').expanduser() / "merged.conf")
-            )
+                "target config", default_path=f"{ SURGE_DIR }/merged.conf")
         )
 
         print(f"ℹ️  Saving config to {args.conf_file}")
@@ -178,9 +181,10 @@ def configure(args):
 
 
 def default_conf_file():
-    conf_path = Path(os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) / "nssurge"
-    os.makedirs(conf_path, exist_ok=True)
-    return conf_path / "config.json"
+    config_dir = os.getenv('XDG_CONFIG_HOME') or '~/.config'
+    conf_path = Path(config_dir).expanduser() / "nssurge" / "config.json"
+    conf_path.parent.mkdir(parents=True, exist_ok=True)
+    return conf_path
 
 
 def main():
@@ -192,11 +196,13 @@ def main():
     parser.add_argument("-t", "--target", nargs='?')
     parser.add_argument("-c", "--conf_file", nargs='?', default=conf_file)
     parser.add_argument("-f", "--force_update", action="store_true")
+    parser.add_argument("--no-backup", action="store_true")
     args = parser.parse_args()
 
     conf = configure(args)
-    backup(conf.target)
     merge(conf.source1, conf.source2, conf.target, args.force_update)
+    if not args.no_backup:
+        backup(conf.target)
 
 
 if __name__ == "__main__":
