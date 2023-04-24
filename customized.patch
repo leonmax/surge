@@ -1,5 +1,5 @@
 [Proxy]
-cos-backoffice = ss, 121.40.94.27, 11998, encrypt-method=aes-128-gcm, password=RJz6SzhIJ#84kQhz2aDJqfTLUPainw, test-url=http://grafana.internal.coscene.site
+cos-backoffice = ssh, bastion.backoffice.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://grafana.internal.coscene.site
 cos-staging = ssh, bastion.staging.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.coscene.cn
 cos-keenon = ssh, bastion.keenon.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.keenon.coscene.cn
 cos-dev = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge_ed25519
@@ -29,8 +29,7 @@ All = select, include-all-proxies=true, include-other-group="🧦Dogess", update
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-staging.ruleset,cos-staging
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-keenon.ruleset,cos-keenon
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-backoffice.ruleset,cos-backoffice
-RULE-SET,https://cdn.jsdelivr.net/gh/dler-io/Rules@main/Surge/Surge%203/Provider/ChatGPT.list,🧠OpenAI
-DOMAIN-SUFFIX,openai.com,🧠OpenAI
+RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/openai.ruleset,🧠OpenAI
 
 # Extra 🇺🇸US sites
 PROCESS-NAME,AMPLibraryAgent,🍎Apple
