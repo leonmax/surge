@@ -1,4 +1,5 @@
 [Proxy]
+#cos-backoffice-ss = ss, 121.40.94.27, 11998, encrypt-method=aes-128-gcm, password=RJz6SzhIJ#84kQhz2aDJqfTLUPainw, test-url=http://grafana.internal.coscene.site
 cos-backoffice = ssh, bastion.backoffice.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://grafana.internal.coscene.site
 cos-staging = ssh, bastion.staging.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.coscene.cn
 cos-keenon = ssh, bastion.keenon.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.keenon.coscene.cn
