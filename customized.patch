@@ -4,11 +4,9 @@ cos-backoffice = ssh, bastion.backoffice.coscene.site, 53124, username=ecs-user,
 cos-staging = ssh, bastion.staging.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.coscene.cn
 cos-keenon = ssh, bastion.keenon.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.keenon.coscene.cn
 cos-dev = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge_ed25519
-oxy-global-relay = https, pr.oxylabs.io, 7777, username=customer-coscene-cc-us-sessid-0997344993-sesstime-30, password=Regular-Attention-2, test-url=http://openai.com, underlying-proxy=Switch
 oxy-us-relay = http, us-pr.oxylabs.io, 10001, username=customer-coscene, password=Regular-Attention-2, test-url=http://openai.com, underlying-proxy=Switch
-oxy-hk-relay = https, a81298871.com, 8000, username=customer-coscene-cc-us-sessid-0997344993-sesstime-30, password=Regular-Attention-2, test-url=http://openai.com, underlying-proxy=Switch
-oxy-bj = https, cnt9t1is.com, 8000, username=customer-coscene-cc-us-sessid-0957101014-sesstime-30, password=Regular-Attention-2, test-url=http://openai.com
 Mike = snell, 158.101.46.207, 56781, psk=gqzTrAd2lVNsKdEs9wXmo5oldJIGHSk, obfs=http
+HK-AC = ss, hk-1.ac.laowanxiang.com, 8388, encrypt-method=chacha20-ietf, password=R1xFwMKOlOho, test-url=http://www.gstatic.com/generate_204
 
 [Proxy Group]
 Switch = select, Proxy, 🧦Dogess, ⇅ Priority List, 🇺🇸US, update-interval=604800, url=http://www.gstatic.com/generate_204
@@ -16,7 +14,7 @@ Switch = select, Proxy, 🧦Dogess, ⇅ Priority List, 🇺🇸US, update-interv
 ⇅ Priority List = fallback, 🇭🇰 香港 HA, Proxy, 🧦Dogess
 🍎Apple = select, DIRECT, Switch, 🇭🇰 香港 HA, 🇺🇸US, 🇭🇰HK, 🇯🇵JP
 📼Netflix = select, 🇭🇰 香港 HA, 🇺🇸US, 🇭🇰HK, 🇯🇵JP
-🧠OpenAI = select, oxy-global-relay, oxy-us-relay, oxy-hk-relay, oxy-bj, include-other-group="🇺🇸US, 🇯🇵JP"
+🧠OpenAI = select, oxy-us-relay, include-other-group="🇺🇸US, 🇯🇵JP"
 All = select, include-all-proxies=true, include-other-group="🧦Dogess", update-interval=604800, url=http://www.gstatic.com/generate_204, no-alert=0, hidden=1
 🇺🇸US = url-test, include-all-proxies=true, include-other-group="🧦Dogess", policy-regex-filter=UnitedStates|US|美国
 🇭🇰HK = url-test, include-all-proxies=true, include-other-group="🧦Dogess", policy-regex-filter=HK|香港, hidden=1
