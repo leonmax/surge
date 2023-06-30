@@ -10,7 +10,7 @@ HK-AC = ss, hk-1.ac.laowanxiang.com, 8388, encrypt-method=chacha20-ietf, passwor
 
 [Proxy Group]
 Switch = select, Proxy, 🧦Dogess, ⇅ Priority List, 🇺🇸US, update-interval=604800, url=http://www.gstatic.com/generate_204
-⇅ Priority List = fallback, 🇭🇰 香港 HA, Proxy, 🧦Dogess
+⇅ Priority List = fallback, 🇭🇰 香港 HA, Proxy, Auto - UrlTest
 🍎Apple = select, DIRECT, Switch, 🇭🇰 香港 HA, 🇺🇸US, 🇭🇰HK, 🇯🇵JP
 📼Netflix = select, 🇭🇰 香港 HA, 🇺🇸US, 🇭🇰HK, 🇯🇵JP
 🧠OpenAI = select, include-all-proxies=true, policy-regex-filter=UnitedStates|US|美国|JP|日本|CA|加拿大|SG|新加坡
