@@ -9,16 +9,16 @@ Mike = snell, 158.101.46.207, 56781, psk=gqzTrAd2lVNsKdEs9wXmo5oldJIGHSk, obfs=h
 HK-AC = ss, hk-1.ac.laowanxiang.com, 8388, encrypt-method=chacha20-ietf, password=R1xFwMKOlOho, test-url=http://www.gstatic.com/generate_204
 
 [Proxy Group]
-Switch = select, Proxy, 🧦Dogess, ⇅ Priority List, 🇺🇸US, update-interval=604800, url=http://www.gstatic.com/generate_204
+Switch = select, Proxy, ⇅ Priority List, update-interval=604800, url=http://www.gstatic.com/generate_204
 ⇅ Priority List = fallback, 🇭🇰 香港 HA, Proxy, Auto - UrlTest
-🍎Apple = select, DIRECT, Switch, 🇭🇰 香港 HA, 🇺🇸US, 🇭🇰HK, 🇯🇵JP
-📼Netflix = select, 🇭🇰 香港 HA, 🇺🇸US, 🇭🇰HK, 🇯🇵JP
+🍎Apple = select, DIRECT, Switch, 🇭🇰 香港 HA, 🇺🇸US, 🇯🇵JP
+📼Netflix = select, 🇭🇰 香港 HA, 🇺🇸US, 🇯🇵JP
 🧠OpenAI = select, include-all-proxies=true, policy-regex-filter=UnitedStates|US|美国|JP|日本|CA|加拿大|SG|新加坡
 All = select, include-all-proxies=true, update-interval=604800, url=http://www.gstatic.com/generate_204, no-alert=0, hidden=1
-🇺🇸US = url-test, include-all-proxies=true, include-other-group="🧦Dogess", policy-regex-filter=UnitedStates|US|美国, hidden=1
-🇭🇰HK = url-test, include-all-proxies=true, include-other-group="🧦Dogess", policy-regex-filter=HK|香港, hidden=1
-🇯🇵JP = url-test, include-all-proxies=true, include-other-group="🧦Dogess", policy-regex-filter=JP|日本, hidden=1
-🧦Dogess = url-test, policy-path=https://ds-sub.me/link/Lusxqu8XaTTTe7o6?list=surge, no-alert=0, hidden=1
+🇺🇸US = url-test, include-all-proxies=true, policy-regex-filter=UnitedStates|US|美国, hidden=1
+🇯🇵JP = url-test, include-all-proxies=true, policy-regex-filter=JP|日本, hidden=1
+# 🇭🇰HK = url-test, include-all-proxies=true, include-other-group="🧦Dogess", policy-regex-filter=HK|香港, hidden=1
+# 🧦Dogess = url-test, policy-path=https://ds-sub.me/link/Lusxqu8XaTTTe7o6?list=surge, no-alert=0, hidden=1
 # 🎠Trojan = url-test, policy-path=https://raw.githubusercontent.com/leonmax/rules/master/proxy/shadowsocks.nz.list, hidden=1, no-alert=0
 
 
