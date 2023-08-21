@@ -162,7 +162,7 @@ def configure(args):
             source1=args.source1 or get_path_from_user(
                 "source config 1", default_path=f"{ SURGE_DIR }/subs/Dler Cloud.conf"),
             source2=args.source2 or get_path_from_user(
-                "source config 2", default_path=f"{ CURRENT_DIR }/customized.patch"),
+                "source config 2", default_path=f"{ CURRENT_DIR }/customized.dconf"),
             target=args.target or get_path_from_user(
                 "target config", default_path=f"{ SURGE_DIR }/merged.conf")
         )
@@ -194,13 +194,17 @@ def main():
     parser.add_argument("source1", nargs='?')
     parser.add_argument("source2", nargs='?')
     parser.add_argument("-t", "--target", nargs='?')
-    parser.add_argument("-c", "--conf_file", nargs='?', default=conf_file)
-    parser.add_argument("-f", "--force_update", action="store_true")
+    parser.add_argument("-c", "--conf-file", nargs='?', default=conf_file)
+    parser.add_argument("-f", "--force-update", action="store_true")
+    parser.add_argument("-d", "--duplicate-only", action="store_true")
     parser.add_argument("--no-backup", action="store_true")
     args = parser.parse_args()
 
     conf = configure(args)
-    merge(conf.source1, conf.source2, conf.target, args.force_update)
+    if args.duplicate_only:
+        shutil.copyfile(conf.source1, conf.target, follow_symlinks=True)
+    else:
+        merge(conf.source1, conf.source2, conf.target, args.force_update)
     if not args.no_backup:
         backup(conf.target)
 
