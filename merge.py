@@ -1,28 +1,27 @@
 #!/usr/bin/env python
 import argparse
 import dataclasses
-from datetime import datetime
+import datetime
 import json
 import os
 import re
 import shutil
 import time
-import urllib.request
-from dataclasses import dataclass
+from urllib import request
 from pathlib import Path
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 SURGE_DIR = os.path.expanduser('~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents')
 
 
-@dataclass
+@dataclasses.dataclass
 class ManagedProfile:
     url: str
     interval: int = 86400  # How often the profile is updated.
     strict: bool = False  # well we basically ignored that
 
     def download(self, filename):
-        urllib.request.urlretrieve(self.url, filename)
+        request.urlretrieve(self.url, filename)
 
     @staticmethod
     def reload(filename, force_update=False):
@@ -47,6 +46,49 @@ class ManagedProfile:
             print(f"ℹ️  Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
             profile.download(filename)
 
+@dataclasses.dataclass
+class ProxyGroup:
+    name: str
+    group_type: str  # select, url-test, fallback, load-balance, comment-or-empty-line
+    proxies: list[str] = dataclasses.field(default_factory=list)
+    properties: dict[str, str] = dataclasses.field(default_factory=dict)
+
+    @staticmethod
+    def parse_line(line):
+        if line.lstrip().startswith("#") or not line.strip():
+            return ProxyGroup(name=line, group_type="comment-or-empty-line")
+        m = re.match(r"^(?P<name>[^=]+)=\s*(?P<group_type>[^,]+)(?P<values>.*)", line)
+        if m:
+            properties = {}
+            proxies = []
+            for value in m.group("values").split(","):
+                value = value.strip()
+                if not value:
+                    continue
+                if "=" in value:
+                    k, v = value.split("=",1)
+                    properties[k] = v
+                else:
+                    proxies.append(value)
+            return ProxyGroup(name=m.group("name").strip(), group_type=m.group("group_type"), proxies=proxies, properties=properties)
+        print("failed to parse line: " + line)
+        return None
+
+    def extend(self, proxy_group):
+        if self.name != proxy_group.name:
+            raise Exception(f"⚠️  Cannot extend proxy group {self.name} with {proxy_group.name}")
+        self.proxies.extend(proxy_group.proxies)
+        self.properties.update(proxy_group.properties)
+
+    def __str__(self):
+        if self.group_type == "comment-or-empty-line":
+            return self.name
+        parts = [f"{self.name} = {self.group_type}"]
+        for proxy in self.proxies:
+            parts.append(proxy)
+        for k, v in self.properties.items():
+            parts.append(f"{k}={v}")
+        return ", ".join(parts) + "\n"
 
 class SurgeProfile:
     def __init__(self, file):
@@ -95,6 +137,39 @@ class SurgeProfile:
     def get_section(self, section_name):
         return self._sections[section_name] if section_name in self._sections else []
 
+    def merge_to_section(self, section_name, lines):
+        if section_name == "Proxy Group":
+            # Map group name to group
+            group_orders = []
+            groups = {}
+            for line in self._sections[section_name]:
+                group = ProxyGroup.parse_line(line)
+                if group:
+                    group_orders.append(group.name)
+                    groups[group.name] = group
+
+            # Merge customized groups
+            self._sections[section_name] = ["# region: Customized\n"]
+            for line in lines:
+                new_group = ProxyGroup.parse_line(line)
+                if new_group and new_group.name in groups:
+                    new_group.extend(groups[new_group.name])
+                    del groups[new_group.name]
+                self._sections[section_name].append(str(new_group))
+            self._sections[section_name] += ["# endregion: Customized\n"]
+
+            # Append the rest groups
+            for group_name in group_orders:
+                if group_name in groups:
+                    self._sections[section_name].append(str(groups[group_name]))
+                    del groups[group_name]
+            # This should not happen
+            if groups:
+                print("⚠️  Why there are still groups unmerged?")
+        else:
+            self.prepend_to_section(section_name, lines)
+
+
     def prepend_to_section(self, section_name, lines):
         if section_name not in self._sections:
             self._section_names.append(section_name)
@@ -120,7 +195,7 @@ def merge(source1: str, source2: str, target: str, force_update: bool = False):
             len2 = len(profile2.get_section(section_name))
             print(f"ℹ️  Merging section [{section_name}]: {len1} + {len2} => {len1 + len2}")
             lines = profile2.get_section(section_name)
-            profile1.prepend_to_section(section_name, lines)
+            profile1.merge_to_section(section_name, lines)
 
     print(f"ℹ️  Saving to {target}")
     profile1.remove_managed_line()
@@ -138,7 +213,7 @@ def get_path_from_user(path_name: str, default_path: str = None) -> str:
 
 
 def backup(original_path):
-    filename = datetime.now().strftime("bk-%Y-%m-%d.conf")
+    filename = datetime.datetime.now().strftime("bk-%Y-%m-%d.conf")
     backup_path = Path(CURRENT_DIR) / 'profiles' / filename
     backup_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -147,7 +222,7 @@ def backup(original_path):
         shutil.copyfile(original_path, backup_path, follow_symlinks=True)
 
 
-@dataclass
+@dataclasses.dataclass
 class Config:
     source1: str
     source2: str
@@ -207,7 +282,6 @@ def main():
         merge(conf.source1, conf.source2, conf.target, args.force_update)
     if not args.no_backup:
         backup(conf.target)
-
 
 if __name__ == "__main__":
     main()
