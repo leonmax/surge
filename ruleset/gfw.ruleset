@@ -3,6 +3,8 @@ DOMAIN,anthology.leonmax.com
 DOMAIN,blog.leonmax.com
 DOMAIN-SUFFIX,coscene.io
 DOMAIN-SUFFIX,coscene.dev
+DOMAIN-SUFFIX,shootproof.com
+DOMAIN-SUFFIX.plugins.jetbrains.com
 # manhuaren
 USER-AGENT,CaricatureManGroup
 USER-AGENT,yingqiDm
@@ -14,6 +16,7 @@ PROCESS-NAME,OneDrive
 PROCESS-NAME,zoom.us
 PROCESS-NAME,Microsoft Teams Helper
 PROCESS-NAME,Slack Helper
+PROCESS-NAME,1Password
 # global
 DOMAIN-SUFFIX,shellhacks.com
 DOMAIN-SUFFIX,python.org
