@@ -4,7 +4,7 @@ DOMAIN,blog.leonmax.com
 DOMAIN-SUFFIX,coscene.io
 DOMAIN-SUFFIX,coscene.dev
 DOMAIN-SUFFIX,shootproof.com
-DOMAIN-SUFFIX.plugins.jetbrains.com
+DOMAIN-SUFFIX,plugins.jetbrains.com
 # manhuaren
 USER-AGENT,CaricatureManGroup
 USER-AGENT,yingqiDm
