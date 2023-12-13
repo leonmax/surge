@@ -8,6 +8,7 @@ import re
 import shutil
 import time
 from urllib import request
+from urllib.error import URLError
 from pathlib import Path
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -21,7 +22,10 @@ class ManagedProfile:
     strict: bool = False  # well we basically ignored that
 
     def download(self, filename):
-        request.urlretrieve(self.url, filename)
+        try:
+            request.urlretrieve(self.url, filename)
+        except URLError as e:
+            print(f"⚠️  Failed to download: {e.reason}, will use cached version.")
 
     @staticmethod
     def reload(filename, force_update=False):
@@ -182,7 +186,7 @@ class SurgeProfile:
         return self._section_names
 
 
-def merge(source1: str, source2: str, target: str, force_update: bool = False):
+def merge(source1: str, source2: str, target: str, force_update: bool = False, dry_run: bool = False):
     ManagedProfile.reload(source1, force_update)
     print(f'ℹ️  Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
@@ -197,9 +201,10 @@ def merge(source1: str, source2: str, target: str, force_update: bool = False):
             lines = profile2.get_section(section_name)
             profile1.merge_to_section(section_name, lines)
 
-    print(f"ℹ️  Saving to {target}")
-    profile1.remove_managed_line()
-    profile1.save(as_file=target)
+    if not dry_run:
+        print(f'ℹ️  Saving to "{target}"')
+        profile1.remove_managed_line()
+        profile1.save(as_file=target)
 
 
 def get_path_from_user(path_name: str, default_path: str = None) -> str:
@@ -217,7 +222,7 @@ def backup(original_path):
     backup_path = Path(CURRENT_DIR) / 'profiles' / filename
     backup_path.parent.mkdir(parents=True, exist_ok=True)
 
-    print(f"ℹ️  Backing up {original_path} to {backup_path}")
+    print(f'ℹ️  Backing up "{original_path}" to "{backup_path}"')
     if os.path.exists(original_path):
         shutil.copyfile(original_path, backup_path, follow_symlinks=True)
 
@@ -273,14 +278,15 @@ def main():
     parser.add_argument("-f", "--force-update", action="store_true")
     parser.add_argument("-d", "--duplicate-only", action="store_true")
     parser.add_argument("--no-backup", action="store_true")
+    parser.add_argument("--dry-run", action="store_true", help="Do not save the target file")
     args = parser.parse_args()
 
     conf = configure(args)
-    if args.duplicate_only:
+    if args.duplicate_only and not args.dry_run:
         shutil.copyfile(conf.source1, conf.target, follow_symlinks=True)
     else:
-        merge(conf.source1, conf.source2, conf.target, args.force_update)
-    if not args.no_backup:
+        merge(conf.source1, conf.source2, conf.target, args.force_update, args.dry_run)
+    if not args.no_backup and not args.dry_run:
         backup(conf.target)
 
 if __name__ == "__main__":
