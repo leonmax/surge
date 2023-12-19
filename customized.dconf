@@ -16,11 +16,12 @@ Switch = select, Proxy, ⇅ Priority List, 🧦Dogess, update-interval=604800, t
 🧦Dogess   = url-test, policy-path=https://dogess.ink/link/8ceWHMwvJhM9suDK?surge=3, no-alert=0, hidden=0
 #🎠Trojan   = url-test, policy-path=https://raw.githubusercontent.com/leonmax/rules/master/proxy/shadowsocks.nz.list, no-alert=0, hidden=1
 Domestic   = select, hidden=1
-Others     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=http://www.gstatic.com/generate_204
 AdBlock    = select, hidden=1
-Anti IP    = select, Switch, hidden=1
-Speedtest  = select, Switch, hidden=1
+Anti IP    = select, Switch, Direct, hidden=1
+Speedtest  = select, Switch, Direct, hidden=1
 Notion     = select, Switch, Direct, hidden=0, test-url=https://www.notion.so
+Others     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1, test-url=http://www.gstatic.com/generate_204
+# Videos
 Netflix    = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=https://www.netflix.com
 Disney     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
 YouTube    = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=https://youtube.com/
@@ -29,18 +30,23 @@ Asian TV   = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, �
 Global TV  = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
 Apple      = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=https://www.apple.com/
 Apple TV   = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
+# Chat
 Telegram   = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0
 Google FCM = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
-Crypto     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
 Discord    = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0
-OpenAI     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=https://openai.com/
+#
 PayPal     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0
+Crypto     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
+OpenAI     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=https://openai.com/
 Microsoft  = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0
 Scholar    = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
+# Gaming
 Steam      = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
 miHoYo     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
-All  = select, include-other-group=🧦Dogess, include-all-proxies=true, no-alert=0, hidden=1, update-interval=604800, test-url=http://www.gstatic.com/generate_204
-🇺🇸US = select, include-other-group=All, policy-regex-filter=US|美国|UnitedStates, hidden=1
+
+# Special Groups
+All    = select, include-other-group=🧦Dogess, include-all-proxies=true, hidden=1, no-alert=0, update-interval=604800, test-url=http://www.gstatic.com/generate_204
+🇺🇸US = select, include-other-group=All, policy-regex-filter=US|美国,   hidden=1
 🇨🇦CA = select, include-other-group=All, policy-regex-filter=CA|加拿大, hidden=1
 🇸🇬SG = select, include-other-group=All, policy-regex-filter=SG|新加坡, hidden=1
 🇯🇵JP = select, include-other-group=All, policy-regex-filter=JP|日本,   hidden=1
