@@ -50,6 +50,7 @@ class ManagedProfile:
             print(f"ℹ️  Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
             profile.download(filename)
 
+
 @dataclasses.dataclass
 class ProxyGroup:
     name: str
@@ -93,6 +94,64 @@ class ProxyGroup:
         for k, v in self.properties.items():
             parts.append(f"{k}={v}")
         return ", ".join(parts) + "\n"
+
+
+@dataclasses.dataclass
+class Proxy:
+    name: str
+    proxy_type: str  # direct, reject, ssh, http, snell, trojan, ss, comment-or-empty-line
+    host: str
+    port: int
+    properties: dict[str, str] = dataclasses.field(default_factory=dict)
+
+    @staticmethod
+    def parse_line(line):
+        if line.lstrip().startswith("#") or not line.strip():
+            return Proxy(name=line, proxy_type="comment-or-empty-line", host=None, port=-1)
+        m = re.match(r"^(?P<name>[^=]+)=\s*(?P<proxy_type>[^,]+),\s*(?P<host>[^,]+),\s*(?P<port>[^,]+),\s*(?P<values>.*)", line)
+        if m:
+            properties = {}
+            for value in m.group("values").split(","):
+                value = value.strip()
+                if not value:
+                    continue
+                if "=" in value:
+                    k, v = value.split("=",1)
+                    properties[k] = v
+            return Proxy(name=m.group("name").strip(), proxy_type=m.group("proxy_type"), host=m.group("host"), port=int(m.group("port")), properties=properties)
+        print("failed to parse line: " + line)
+        return None
+
+    def __str__(self):
+        if self.proxy_type == "comment-or-empty-line":
+            return self.name
+        parts = [f"{self.name} = {self.proxy_type}, {self.host}, {self.port}"]
+        for k, v in self.properties.items():
+            parts.append(f"{k}={v}")
+        return ", ".join(parts) + "\n"
+
+
+
+@dataclasses.dataclass
+class Item:
+    name: str
+    config_type: str  # values, comment-or-empty-line
+    values: list[str]
+
+    def parse_line(line):
+        if line.lstrip().startswith("#") or not line.strip():
+            return Item(name=line, config_type="comment-or-empty-line", values=None)
+        m = re.match(r"^(?P<name>[^=]+)=\s*(?P<values>.*)", line)
+        if m:
+            return Item(name=m.group("name").strip(), config_type="values", values=m.group("values").split(","))
+        print("failed to parse line: " + line)
+        return None
+
+    def __str__(self):
+        if self.config_type == "comment-or-empty-line":
+            return self.name
+        return f"{self.name} = {', '.join(self.values)}\n"
+
 
 class SurgeProfile:
     def __init__(self, file):
@@ -170,6 +229,35 @@ class SurgeProfile:
             # This should not happen
             if groups:
                 print("⚠️  Why there are still groups unmerged?")
+        elif section_name == "General":
+            # Map config name to config
+            config_orders = []
+            configs = {}
+            for line in self._sections[section_name]:
+                config = Item.parse_line(line)
+                if config:
+                    config_orders.append(config.name)
+                    configs[config.name] = config
+
+            # Merge customized configs
+            self._sections[section_name] = ["# region: Customized\n"]
+            for line in lines:
+                new_config = Item.parse_line(line)
+                if new_config and new_config.name in configs:
+                    configs[new_config.name].values = new_config.values
+                    del configs[new_config.name]
+                self._sections[section_name].append(str(new_config))
+            self._sections[section_name] += ["# endregion: Customized\n"]
+
+            # Append the rest configs
+            for config_name in config_orders:
+                if config_name in configs:
+                    self._sections[section_name].append(str(configs[config_name]))
+                    del configs[config_name]
+
+            # This should not happen
+            if configs:
+                print("⚠️  Why there are still configs unmerged?")
         else:
             self.prepend_to_section(section_name, lines)
 
