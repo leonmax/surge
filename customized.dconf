@@ -19,7 +19,7 @@ cos-dev = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge_ed
 
 [Proxy Group]
 Switch = select, Proxy, ⇅ Priority List, 🧦Dogess, update-interval=604800, test-url=http://www.gstatic.com/generate_204
-⇅ Priority List = fallback, 🇭🇰 香港 HA, 🧦Dogess, Proxy, Auto - UrlTest
+⇅ Priority List = fallback, 🇯🇵 日本 HA, 🇭🇰 香港 HA, 🧦Dogess, Proxy, Auto - UrlTest
 🧦Dogess   = url-test, policy-path=https://dogess.ink/link/8ceWHMwvJhM9suDK?surge=3, no-alert=0, hidden=0
 #🎠Trojan   = url-test, policy-path=https://raw.githubusercontent.com/leonmax/rules/master/proxy/shadowsocks.nz.list, no-alert=0, hidden=1
 Domestic   = select, hidden=1
