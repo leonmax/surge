@@ -66,6 +66,8 @@ All    = select, include-other-group=🧦Dogess, include-all-proxies=true, hidde
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-staging.ruleset,cos-staging
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-keenon.ruleset,cos-keenon
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-backoffice.ruleset,cos-backoffice
+DOMAIN-SUFFIX,coscene.cn,DIRECT
+
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/openai.ruleset,OpenAI
 
 # Extra 🇺🇸US sites
@@ -109,3 +111,6 @@ PROCESS-NAME,speedtest,DIRECT
 
 RULE-SET,https://raw.githubusercontent.com/dler-io/Rules/main/Surge/Surge%203/Provider/Proxy.list,Switch
 
+
+[Body Rewrite]
+http-response ^https://ab\.chatgpt\.com/v1/ '"gateValue":"false"' '"gateValue":"true"' '"value":false' '"value":true'
