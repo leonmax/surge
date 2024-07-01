@@ -67,6 +67,7 @@ RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-stag
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-keenon.ruleset,cos-keenon
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-backoffice.ruleset,cos-backoffice
 DOMAIN-SUFFIX,coscene.cn,DIRECT
+DOMAIN-SUFFIX,coscene.site,DIRECT
 
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/openai.ruleset,OpenAI
 
