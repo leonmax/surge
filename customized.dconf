@@ -27,7 +27,7 @@ AdBlock    = select, hidden=1
 Anti IP    = select, Switch, Direct, hidden=1
 Speedtest  = select, Switch, Direct, hidden=1
 Notion     = select, Switch, Direct, hidden=0, test-url=https://www.notion.so
-Others     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1, test-url=http://www.gstatic.com/generate_204
+Others     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=http://www.gstatic.com/generate_204
 # Videos
 Netflix    = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=https://www.netflix.com
 Disney     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
@@ -53,7 +53,7 @@ miHoYo     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, �
 
 # Special Groups
 All    = select, include-other-group=🧦Dogess, include-all-proxies=true, hidden=1, no-alert=0, update-interval=604800, test-url=http://www.gstatic.com/generate_204
-🇺🇸US = select, include-other-group=All, policy-regex-filter=US|美国,   hidden=1
+🇺🇸US = select, include-other-group=All, policy-regex-filter=US|美国,   hidden=0
 🇨🇦CA = select, include-other-group=All, policy-regex-filter=CA|加拿大, hidden=1
 🇸🇬SG = select, include-other-group=All, policy-regex-filter=SG|新加坡, hidden=1
 🇯🇵JP = select, include-other-group=All, policy-regex-filter=JP|日本,   hidden=1
@@ -68,6 +68,7 @@ RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-keen
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-backoffice.ruleset,cos-backoffice
 DOMAIN-SUFFIX,coscene.cn,DIRECT
 DOMAIN-SUFFIX,coscene.site,DIRECT
+DOMAIN-SUFFIX,gov.cn,DIRECT
 
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/openai.ruleset,OpenAI
 
