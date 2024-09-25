@@ -73,13 +73,17 @@ DOMAIN-SUFFIX,gov.cn,DIRECT
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/openai.ruleset,OpenAI
 
 # Extra 🇺🇸US sites
+RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/Apple-News.list,🇺🇸US
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AppleNews/AppleNews.list,🇺🇸US
+RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/us.ruleset,🇺🇸US
+
+# Apple
 PROCESS-NAME,AMPLibraryAgent,Apple
 PROCESS-NAME,AMPArtworkAgent,Apple
 PROCESS-NAME,itunescloudd,Apple
 PROCESS-NAME,Music,Apple
 PROCESS-NAME,TV,Apple
-
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/us.ruleset,🇺🇸US
+RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Apple/Apple.list,Apple
 
 # Netflix
 DOMAIN-KEYWORD,netflix,Netflix
@@ -106,7 +110,6 @@ IP-CIDR,17.0.0.0/8,DIRECT,no-resolve
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/gfw.ruleset,Switch
 RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/force-remote-dns.ruleset,Switch
 RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/foreign.list,Switch
-RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/Apple-News.list,🇺🇸US
 
 PROCESS-NAME,Transmission,DIRECT
 PROCESS-NAME,speedtest,DIRECT
