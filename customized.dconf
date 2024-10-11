@@ -6,13 +6,10 @@ wifi-access-http-port = 18178
 wifi-access-socks5-port = 18179
 
 [Proxy]
-#cos-backoffice-ss = ss, 121.40.94.27, 11998, encrypt-method=aes-128-gcm, password=RJz6SzhIJ#84kQhz2aDJqfTLUPainw, test-url=http://grafana.internal.coscene.site
-cos-backoffice = ssh, bastion.backoffice.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://grafana.internal.coscene.site
-cos-staging = ssh, bastion.staging.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.coscene.cn
-cos-keenon = ssh, bastion.keenon.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.keenon.coscene.cn
-cos-dev = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge_ed25519
-#oxy-us-relay = http, us-pr.oxylabs.io, 10001, username=customer-coscene, password=Regular-Attention-2, test-url=http://openai.com, underlying-proxy=Switch
-#Mike = snell, 158.101.46.207, 56781, psk=gqzTrAd2lVNsKdEs9wXmo5oldJIGHSk, obfs=http
+co-backoffice = ssh, bastion.backoffice.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://grafana.internal.coscene.site
+co-production = ssh, bastion.keenon.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.keenon.coscene.cn
+co-staging = ssh, bastion.staging.coscene.site, 53124, username=ecs-user, private-key=surge_ed25519, test-url=http://api.internal.coscene.cn
+co-develop = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge_ed25519
 #HK-AC = ss, hk-1.ac.laowanxiang.com, 8388, encrypt-method=chacha20-ietf, password=R1xFwMKOlOho, test-url=http://www.gstatic.com/generate_204
 #🇯🇵 日本 HA = ss, jp-1.ha.laowanxiang.com, 43822, encrypt-method=chacha20-ietf, password=R1xFwMKOlOho, udp-relay=true, no-error-alert=true, fast-open=true
 #🇭🇰 香港 HA = ss, hk-1.ha.laowanxiang.com, 43822, encrypt-method=chacha20-ietf, password=R1xFwMKOlOho, udp-relay=true, no-error-alert=true, fast-open=true
@@ -20,8 +17,8 @@ cos-dev = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge_ed
 [Proxy Group]
 Switch = select, Proxy, ⇅ Priority List, 🧦Dogess, update-interval=604800, test-url=http://www.gstatic.com/generate_204
 ⇅ Priority List = fallback, 🇯🇵 日本 HA, 🇭🇰 香港 HA, 🧦Dogess, Proxy, Auto - UrlTest
-🧦Dogess   = url-test, policy-path=https://dogess.ink/link/8ceWHMwvJhM9suDK?surge=3, no-alert=0, hidden=0
-#🎠Trojan   = url-test, policy-path=https://raw.githubusercontent.com/leonmax/rules/master/proxy/shadowsocks.nz.list, no-alert=0, hidden=1
+🧦Dogess   = smart, policy-path=https://dogess.ink/link/8ceWHMwvJhM9suDK?surge=3, no-alert=0, hidden=0
+#🎠Trojan   = smart, policy-path=https://raw.githubusercontent.com/leonmax/rules/master/proxy/shadowsocks.nz.list, no-alert=0, hidden=1
 Domestic   = select, hidden=1
 AdBlock    = select, hidden=1
 Anti IP    = select, Switch, Direct, hidden=1
@@ -63,26 +60,22 @@ All    = select, include-other-group=🧦Dogess, include-all-proxies=true, hidde
 
 [Rule]
 # coScene
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-staging.ruleset,cos-staging
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-keenon.ruleset,cos-keenon
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cos-backoffice.ruleset,cos-backoffice
-DOMAIN-SUFFIX,coscene.cn,DIRECT
-DOMAIN-SUFFIX,coscene.site,DIRECT
-DOMAIN-SUFFIX,gov.cn,DIRECT
+RULE-SET,ruleset/co-staging.ruleset,co-staging
+RULE-SET,ruleset/co-production.ruleset,co-production
+RULE-SET,ruleset/co-backoffice.ruleset,co-backoffice
+RULE-SET,ruleset/direct.ruleset,DIRECT
 
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/openai.ruleset,OpenAI
+# OpenAI
+RULE-SET,ruleset/openai.ruleset,OpenAI
+DOMAIN-SUFFIX,notion.so,Notion
 
 # Extra 🇺🇸US sites
 RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/Apple-News.list,🇺🇸US
 RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/AppleNews/AppleNews.list,🇺🇸US
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/us.ruleset,🇺🇸US
+RULE-SET,ruleset/us.ruleset,🇺🇸US
 
 # Apple
-PROCESS-NAME,AMPLibraryAgent,Apple
-PROCESS-NAME,AMPArtworkAgent,Apple
-PROCESS-NAME,itunescloudd,Apple
-PROCESS-NAME,Music,Apple
-PROCESS-NAME,TV,Apple
+RULE-SET,ruleset/apple.ruleset,Apple
 RULE-SET,https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Surge/Apple/Apple.list,Apple
 
 # Netflix
@@ -90,29 +83,26 @@ DOMAIN-KEYWORD,netflix,Netflix
 DOMAIN-KEYWORD,nflx,Netflix
 RULE-SET,https://raw.githubusercontent.com/Blankwonder/surge-list/master/netflix.list,Netflix
 
-DOMAIN-SUFFIX,notion.so,Notion
-
 # block ad
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/ads.ruleset,REJECT
+RULE-SET,ruleset/ads.ruleset,REJECT
 RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Custom/ad-domains.list,REJECT
 RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/common-ad-keyword.list,REJECT
 
 # cn sites
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/on-the-fence.ruleset,DIRECT
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/cn.ruleset,DIRECT
+RULE-SET,ruleset/on-the-fence.ruleset,DIRECT
+RULE-SET,ruleset/cn.ruleset,DIRECT
 # RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/CN.list,DIRECT
 
 # Apple Services
 RULE-SET,SYSTEM,DIRECT
-IP-CIDR,17.0.0.0/8,DIRECT,no-resolve
+IP-CIDR,17.0.0.0/8,Apple,no-resolve
 
 # effing gfw
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/gfw.ruleset,Switch
-RULE-SET,https://raw.githubusercontent.com/leonmax/rules/master/ruleset/force-remote-dns.ruleset,Switch
+RULE-SET,ruleset/gfw.ruleset,Switch
+RULE-SET,ruleset/force-remote-dns.ruleset,Switch
 RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/foreign.list,Switch
 
-PROCESS-NAME,Transmission,DIRECT
-PROCESS-NAME,speedtest,DIRECT
+
 
 RULE-SET,https://raw.githubusercontent.com/dler-io/Rules/main/Surge/Surge%203/Provider/Proxy.list,Switch
 
