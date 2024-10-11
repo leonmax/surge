@@ -13,6 +13,7 @@ from pathlib import Path
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 SURGE_DIR = os.path.expanduser('~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents')
+URL_PREFIX = "https://raw.githubusercontent.com/leonmax/rules/master"
 
 
 @dataclasses.dataclass
@@ -43,13 +44,16 @@ class ManagedProfile:
             if k == "strict":
                 profile.strict = bool(v)
 
+        mtime = Path(filename).stat().st_mtime
         if force_update:
             print(f"ℹ️  Downloading managed config from {profile.url}. It's forced.")
             profile.download(filename)
-        elif time.time() > Path(filename).stat().st_mtime + profile.interval:
+        elif time.time() > mtime + profile.interval:
             print(f"ℹ️  Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
             profile.download(filename)
-
+        else:
+            mdatetime = datetime.datetime.strftime(datetime.datetime.fromtimestamp(mtime), "%Y/%m/%m %H:%M:%S")
+            print(f"ℹ️  Managed config is as new as {mdatetime}.")
 
 @dataclasses.dataclass
 class ProxyGroup:
@@ -58,8 +62,8 @@ class ProxyGroup:
     proxies: list[str] = dataclasses.field(default_factory=list)
     properties: dict[str, str] = dataclasses.field(default_factory=dict)
 
-    @staticmethod
-    def parse_line(line):
+    @classmethod
+    def parse_line(cls, line):
         if line.lstrip().startswith("#") or not line.strip():
             return ProxyGroup(name=line, group_type="comment-or-empty-line")
         m = re.match(r"^(?P<name>[^=]+)=\s*(?P<group_type>[^,]+)(?P<values>.*)", line)
@@ -100,12 +104,12 @@ class ProxyGroup:
 class Proxy:
     name: str
     proxy_type: str  # direct, reject, ssh, http, snell, trojan, ss, comment-or-empty-line
-    host: str
+    host: str|None
     port: int
     properties: dict[str, str] = dataclasses.field(default_factory=dict)
 
-    @staticmethod
-    def parse_line(line):
+    @classmethod
+    def parse_line(cls, line):
         if line.lstrip().startswith("#") or not line.strip():
             return Proxy(name=line, proxy_type="comment-or-empty-line", host=None, port=-1)
         m = re.match(r"^(?P<name>[^=]+)=\s*(?P<proxy_type>[^,]+),\s*(?P<host>[^,]+),\s*(?P<port>[^,]+),\s*(?P<values>.*)", line)
@@ -131,14 +135,14 @@ class Proxy:
         return ", ".join(parts) + "\n"
 
 
-
 @dataclasses.dataclass
 class Item:
     name: str
     config_type: str  # values, comment-or-empty-line
-    values: list[str]
+    values: list[str]|None
 
-    def parse_line(line):
+    @classmethod
+    def parse_line(cls, line: str) -> 'Item | None':
         if line.lstrip().startswith("#") or not line.strip():
             return Item(name=line, config_type="comment-or-empty-line", values=None)
         m = re.match(r"^(?P<name>[^=]+)=\s*(?P<values>.*)", line)
@@ -184,6 +188,9 @@ class SurgeProfile:
     def remove_managed_line(self):
         self._managed_config = None
 
+    def add_managed_line(self, url, interval=86400, strict=False):
+        self._managed_config = f"#!MANAGED-CONFIG {url} interval={interval} strict={strict}\n"
+
     def save(self, as_file=None):
         _file = as_file or self._file
         with open(_file, "w+") as f:
@@ -200,64 +207,44 @@ class SurgeProfile:
     def get_section(self, section_name):
         return self._sections[section_name] if section_name in self._sections else []
 
+    def merge_items(self, section_name, lines, item_class):
+        # Map item name to item
+        item_orders = []
+        items = {}
+        for line in self._sections[section_name]:
+            item = item_class.parse_line(line)
+            if item:
+                item_orders.append(item.name)
+                items[item.name] = item
+
+        # Merge customized items
+        self._sections[section_name] = ["# region: Customized\n"]
+        for line in lines:
+            new_item = item_class.parse_line(line)
+            if new_item and new_item.name in items:
+                if hasattr(new_item, 'extend'):
+                    new_item.extend(items[new_item.name])
+                else:
+                    items[new_item.name].values = new_item.values
+                del items[new_item.name]
+            self._sections[section_name].append(str(new_item))
+        self._sections[section_name] += ["# endregion: Customized\n"]
+
+        # Append the rest items
+        for item_name in item_orders:
+            if item_name in items:
+                self._sections[section_name].append(str(items[item_name]))
+                del items[item_name]
+
+        # This should not happen
+        if items:
+            print(f"⚠️  Why there are still {item_class.__name__.lower()}s unmerged?")
+
     def merge_to_section(self, section_name, lines):
         if section_name == "Proxy Group":
-            # Map group name to group
-            group_orders = []
-            groups = {}
-            for line in self._sections[section_name]:
-                group = ProxyGroup.parse_line(line)
-                if group:
-                    group_orders.append(group.name)
-                    groups[group.name] = group
-
-            # Merge customized groups
-            self._sections[section_name] = ["# region: Customized\n"]
-            for line in lines:
-                new_group = ProxyGroup.parse_line(line)
-                if new_group and new_group.name in groups:
-                    new_group.extend(groups[new_group.name])
-                    del groups[new_group.name]
-                self._sections[section_name].append(str(new_group))
-            self._sections[section_name] += ["# endregion: Customized\n"]
-
-            # Append the rest groups
-            for group_name in group_orders:
-                if group_name in groups:
-                    self._sections[section_name].append(str(groups[group_name]))
-                    del groups[group_name]
-            # This should not happen
-            if groups:
-                print("⚠️  Why there are still groups unmerged?")
+            self.merge_items(section_name, lines, ProxyGroup)
         elif section_name == "General":
-            # Map config name to config
-            config_orders = []
-            configs = {}
-            for line in self._sections[section_name]:
-                config = Item.parse_line(line)
-                if config:
-                    config_orders.append(config.name)
-                    configs[config.name] = config
-
-            # Merge customized configs
-            self._sections[section_name] = ["# region: Customized\n"]
-            for line in lines:
-                new_config = Item.parse_line(line)
-                if new_config and new_config.name in configs:
-                    configs[new_config.name].values = new_config.values
-                    del configs[new_config.name]
-                self._sections[section_name].append(str(new_config))
-            self._sections[section_name] += ["# endregion: Customized\n"]
-
-            # Append the rest configs
-            for config_name in config_orders:
-                if config_name in configs:
-                    self._sections[section_name].append(str(configs[config_name]))
-                    del configs[config_name]
-
-            # This should not happen
-            if configs:
-                print("⚠️  Why there are still configs unmerged?")
+            self.merge_items(section_name, lines, Item)
         else:
             self.prepend_to_section(section_name, lines)
 
@@ -274,12 +261,21 @@ class SurgeProfile:
         return self._section_names
 
 
-def merge(source1: str, source2: str, target: str, force_update: bool = False, dry_run: bool = False):
+def merge(source1: str, source2: str, target: str, remote_ruleset = True, force_update: bool = False, dry_run: bool = False):
     ManagedProfile.reload(source1, force_update)
     print(f'ℹ️  Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
     print(f'ℹ️  Loading from "{source2}"')
     profile2 = SurgeProfile(source2)
+
+    target_ruleset = Path(target).parent / "ruleset"
+    temp_ruleset = Path(source2).parent / "ruleset"
+
+    if not remote_ruleset and not dry_run:
+        # 复制 ruleset 文件夹回来，这样 surge 里面手动记录的 rule 不会丢失
+        print(f'ℹ️  Copying rulesets back to "{temp_ruleset}"')
+        if target_ruleset.is_dir() and target_ruleset.is_dir():
+            copy_referenced_files(target_ruleset, temp_ruleset)
 
     for section_name in profile2.section_names:
         if section_name:
@@ -287,12 +283,50 @@ def merge(source1: str, source2: str, target: str, force_update: bool = False, d
             len2 = len(profile2.get_section(section_name))
             print(f"ℹ️  Merging section [{section_name}]: {len1} + {len2} => {len1 + len2}")
             lines = profile2.get_section(section_name)
+            # 转换本地路径为 HTTPS URL
+            if section_name == "Rule" and remote_ruleset:
+                print(f"ℹ️️  Converting local path to HTTP URL in {section_name}")
+                lines = [convert_local_path_to_http(line) for line in lines]
             profile1.merge_to_section(section_name, lines)
 
     if not dry_run:
         print(f'ℹ️  Saving to "{target}"')
         profile1.remove_managed_line()
         profile1.save(as_file=target)
+        if not remote_ruleset:
+            # 复制 ruleset 文件夹到终点
+            print(f'ℹ️  Copying rulesets to "{Path(target).parent}"')
+            target_ruleset.mkdir(parents=True, exist_ok=True)
+            copy_referenced_files(temp_ruleset, target_ruleset)
+
+
+def convert_local_path_to_http(line):
+    if line.startswith("RULE-SET,") and not (
+            line.startswith("RULE-SET,https://") or
+            line.startswith("RULE-SET,SYSTEM")
+    ):
+        parts = line.split(",")
+        local_path = parts[1].strip()
+        url = f"{URL_PREFIX}/{local_path}"  # 替换为实际的 HTTP URL 前缀
+        print(f"ℹ️  {local_path} → {url}")
+        parts[1] = url
+        return ",".join(parts)
+    return line
+
+
+def copy_referenced_files(source_folder, target_folder):
+    source_path = Path(source_folder)
+    target_path = Path(target_folder)
+    if source_path.exists() and source_path.is_dir():
+        for item in source_path.iterdir():
+            target_file = target_path / item.name
+            if item.is_file():
+                if item.resolve() == target_file.resolve():
+                    print(f"⚠️  Skipping copy of {item} to itself.")
+                else:
+                    if target_file.exists():
+                        print(f"⚠️  File {target_file} already exists and will be overwritten.")
+                    shutil.copy(item, target_file)
 
 
 def get_path_from_user(path_name: str, default_path: str = None) -> str:
@@ -363,6 +397,7 @@ def main():
     parser.add_argument("source2", nargs='?')
     parser.add_argument("-t", "--target", nargs='?')
     parser.add_argument("-c", "--conf-file", nargs='?', default=conf_file)
+    parser.add_argument("-r", "--remote-ruleset", action="store_true")
     parser.add_argument("-f", "--force-update", action="store_true")
     parser.add_argument("-d", "--duplicate-only", action="store_true")
     parser.add_argument("--no-backup", action="store_true")
@@ -373,7 +408,14 @@ def main():
     if args.duplicate_only and not args.dry_run:
         shutil.copyfile(conf.source1, conf.target, follow_symlinks=True)
     else:
-        merge(conf.source1, conf.source2, conf.target, args.force_update, args.dry_run)
+        merge(
+            source1=conf.source1,
+            source2=conf.source2,
+            target=conf.target,
+            remote_ruleset=args.remote_ruleset,
+            force_update=args.force_update,
+            dry_run=args.dry_run
+        )
     if not args.no_backup and not args.dry_run:
         backup(conf.target)
 
