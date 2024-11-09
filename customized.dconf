@@ -100,8 +100,7 @@ IP-CIDR,17.0.0.0/8,Apple,no-resolve
 # effing gfw
 RULE-SET,ruleset/gfw.ruleset,Switch
 RULE-SET,ruleset/force-remote-dns.ruleset,Switch
-RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/foreign.list,Switch
-
+#RULE-SET,https://raw.githubusercontent.com/Hackl0us/SS-Rule-Snippet/master/Rulesets/Surge/Basic/foreign.list,Switch
 
 
 RULE-SET,https://raw.githubusercontent.com/dler-io/Rules/main/Surge/Surge%203/Provider/Proxy.list,Switch
