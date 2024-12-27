@@ -15,13 +15,12 @@ co-develop = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge
 #🇭🇰 香港 HA = ss, hk-1.ha.laowanxiang.com, 43822, encrypt-method=chacha20-ietf, password=R1xFwMKOlOho, udp-relay=true, no-error-alert=true, fast-open=true
 
 [Proxy Group]
-Switch = select, Proxy, ⇅ Priority List, 🧦Dogess, update-interval=604800, test-url=http://www.gstatic.com/generate_204
-⇅ Priority List = fallback, 🇯🇵 日本 HA, 🇭🇰 香港 HA, 🧦Dogess, Proxy, Auto - UrlTest
+Switch     = select, Proxy, ⇅ Fallback, 🧦Dogess, update-interval=604800, test-url=http://www.gstatic.com/generate_204
+⇅ Fallback = fallback, 🇯🇵 日本 HA, 🇭🇰 香港 HA, 🧦Dogess, Proxy, Auto - UrlTest
 🧦Dogess   = smart, policy-path=https://dogess.ink/link/8ceWHMwvJhM9suDK?surge=3, no-alert=0, hidden=0
 Domestic   = select, hidden=1
 AdBlock    = select, hidden=1
 HTTPDNS    = select, Direct, hidden=1
-CN Mainland TV = select, Direct, hidden=1
 Speedtest  = select, Switch, Direct, hidden=1
 Notion     = select, Switch, Direct, hidden=0, test-url=https://www.notion.so
 Others     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=http://www.gstatic.com/generate_204
@@ -48,6 +47,9 @@ Scholar    = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, �
 # Gaming
 Steam      = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
 miHoYo     = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
+
+# Reverse
+CN Mainland TV = select, Direct, hidden=1
 
 # Special Groups
 All    = select, include-other-group=🧦Dogess, include-all-proxies=true, hidden=1, no-alert=0, update-interval=604800, test-url=http://www.gstatic.com/generate_204

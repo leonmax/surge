@@ -37,3 +37,11 @@ By default, the merge command will merge `managed/managed_profile.conf ` with `c
 > ./merge.py
 > cp profiles/merged.conf ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/merged.conf
 ```
+
+a easier way to merge the profile with docker
+```shell
+docker run --rm -it -v $(pwd):/app python:3 \
+  python /app/merge.py -rnft /app/merged.conf \
+  "https://dler.cloud/subscribe/A57y6psKvMFDxQVRT0IH?surge=smart" \
+  "/app/customized.dconf"
+```

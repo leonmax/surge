@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import time
+import tempfile
 from urllib import request
 from urllib.error import URLError
 from pathlib import Path
@@ -262,7 +263,13 @@ class SurgeProfile:
 
 
 def merge(source1: str, source2: str, target: str, remote_ruleset = True, force_update: bool = False, dry_run: bool = False):
-    ManagedProfile.reload(source1, force_update)
+    if source1.startswith("https://"):
+        print(f'ℹ️  Downloading managed profile from "{source1}"')
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as tmp:
+           ManagedProfile(url=source1, interval=0, strict=True).download(tmp.name)
+        source1 = tmp.name
+    else:
+        ManagedProfile.reload(source1, force_update)
     print(f'ℹ️  Loading from "{source1}"')
     profile1 = SurgeProfile(source1)
     print(f'ℹ️  Loading from "{source2}"')
@@ -400,7 +407,7 @@ def main():
     parser.add_argument("-r", "--remote-ruleset", action="store_true")
     parser.add_argument("-f", "--force-update", action="store_true")
     parser.add_argument("-d", "--duplicate-only", action="store_true")
-    parser.add_argument("--no-backup", action="store_true")
+    parser.add_argument("-n", "--no-backup", action="store_true")
     parser.add_argument("--dry-run", action="store_true", help="Do not save the target file")
     args = parser.parse_args()
 
