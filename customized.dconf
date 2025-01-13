@@ -16,7 +16,7 @@ co-develop = ssh, bastion.coscene.dev, 22, username=azureuser, private-key=surge
 
 [Proxy Group]
 Switch     = select, Proxy, ⇅ Fallback, 🧦Dogess, update-interval=604800, test-url=http://www.gstatic.com/generate_204
-⇅ Fallback = fallback, 🇯🇵 日本 HA, 🇭🇰 香港 HA, 🧦Dogess, Proxy, Auto - UrlTest
+⇅ Fallback = fallback, 🇯🇵HA, 🇭🇰HA, 🧦Dogess, Proxy, Auto - UrlTest
 🧦Dogess   = smart, policy-path=https://dogess.ink/link/8ceWHMwvJhM9suDK?surge=3, no-alert=0, hidden=0
 Domestic   = select, hidden=1
 AdBlock    = select, hidden=1
@@ -60,6 +60,8 @@ All    = select, include-other-group=🧦Dogess, include-all-proxies=true, hidde
 🇰🇷KR = select, include-other-group=All, policy-regex-filter=KR|韩国,   hidden=1
 🇭🇰HK = select, include-other-group=All, policy-regex-filter=HK|香港,   hidden=1
 🏝️TW = select, include-other-group=All, policy-regex-filter=TW|台湾,   hidden=1
+🇯🇵HA = select, include-other-group=All, policy-regex-filter=日本 HA,   hidden=1
+🇭🇰HA = select, include-other-group=All, policy-regex-filter=香港 HA,   hidden=1
 
 [Rule]
 # coScene
