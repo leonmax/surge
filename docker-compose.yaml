@@ -1,0 +1,11 @@
+services:
+  merge:
+    image: python:3
+    container_name: surge-merge-conf
+    restart: "no"
+    working_dir: /action
+    volumes:
+      - .:/action
+    env_file:
+      - .env
+    command: python3 merge.py -rnft $TARGET $URL $DCONF
