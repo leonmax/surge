@@ -11,6 +11,5 @@ URL_OR_FILE="$1"
 TARGET_FILE="$2"
 
 # Execute the docker command with the given inputs
-docker run --rm -it -v "$(pwd):/app" --workdir /app python:3 \
-    python merge.py -rnft "$TARGET_FILE" \
-    "$URL_OR_FILE" customized.dconf
+docker run --rm -it -v "$(pwd):/action" --workdir /action python:3 \
+    python merge.py "$URL_OR_FILE" customized.dconf -rnft "$TARGET_FILE"

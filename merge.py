@@ -227,6 +227,7 @@ class SurgeProfile:
 
     def save(self, as_file=None):
         _file = as_file or self._file
+        Path(_file).parent.mkdir(parents=True, exist_ok=True)
         with open(_file, "w+") as f:
             if self._managed_config:
                 f.write(self._managed_config)
