@@ -8,4 +8,4 @@ services:
       - .:/action
     env_file:
       - .env
-    command: python3 merge.py -rnft $TARGET -m "https://raw.githubusercontent.com/leonmax/surge/refs/heads/gh-pages/all-in-one.conf" $URL $DCONF
+    command: python3 merge.py -mnrft $TARGET $URL $DCONF

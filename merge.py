@@ -16,7 +16,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 SURGE_DIR = os.path.expanduser(
     "~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents"
 )
-URL_PREFIX = "https://raw.githubusercontent.com/leonmax/rules/master"
+DEFAULT_URL_PREFIX = "https://raw.githubusercontent.com/leonmax/surge/main"
 
 
 @dataclasses.dataclass
@@ -301,9 +301,10 @@ def merge(
     source1: str,
     source2: str,
     target: str,
+    url_prefix: str,
     remote_ruleset=True,
     force_update: bool = False,
-    managed_config_url: str = None,
+    managed_config: bool = False,
     dry_run: bool = False,
 ):
     if source1.startswith("https://"):
@@ -338,14 +339,17 @@ def merge(
             # 转换本地路径为 HTTPS URL
             if section_name == "Rule" and remote_ruleset:
                 print(f"ℹ️️  Converting local path to HTTP URL in {section_name}")
-                lines = [convert_local_path_to_http(line) for line in lines]
+                lines = [convert_local_path_to_http(line, url_prefix) for line in lines]
             profile1.merge_to_section(section_name, lines)
 
+    profile1.remove_managed_line()
+    if managed_config:
+        print(f"ℹ️  Manage config at {url_prefix}/{target}")
+        profile1.set_managed_line(url=f"{url_prefix}/{target}")
+
     if not dry_run:
+
         print(f'ℹ️  Saving to "{target}"')
-        profile1.remove_managed_line()
-        if managed_config_url:
-            profile1.set_managed_line(url=managed_config_url)
         profile1.save(as_file=target)
         if not remote_ruleset:
             # 复制 ruleset 文件夹到终点
@@ -354,13 +358,13 @@ def merge(
             copy_referenced_files(temp_ruleset, target_ruleset)
 
 
-def convert_local_path_to_http(line):
+def convert_local_path_to_http(line, url_prefix):
     if line.startswith("RULE-SET,") and not (
         line.startswith("RULE-SET,https://") or line.startswith("RULE-SET,SYSTEM")
     ):
         parts = line.split(",")
         local_path = parts[1].strip()
-        url = f"{URL_PREFIX}/{local_path}"  # 替换为实际的 HTTP URL 前缀
+        url = f"{url_prefix}/{local_path}"  # 替换为实际的 HTTP URL 前缀
         print(f"ℹ️  {local_path} → {url}")
         parts[1] = url
         return ",".join(parts)
@@ -409,6 +413,7 @@ class Config:
     source1: str
     source2: str
     target: str
+    url_prefix: str
 
 
 def configure(args):
@@ -428,6 +433,12 @@ def configure(args):
             or get_path_from_user(
                 "target config", default_path=f"{ SURGE_DIR }/all-in-one.conf"
             ),
+            url_prefix=args.url_prefix
+            or os.getenv("URL_PREFIX")
+            or get_path_from_user(
+                "url prefix for rulesets and managed config",
+                default_path=DEFAULT_URL_PREFIX,
+            ),
         )
 
         print(f"ℹ️  Saving config to {args.conf_file}")
@@ -440,6 +451,7 @@ def configure(args):
             source1=args.source1 or conf.source1,
             source2=args.source2 or conf.source2,
             target=args.target or conf.target,
+            url_prefix=args.url_prefix or conf.url_prefix,
         )
     return conf
 
@@ -460,12 +472,11 @@ def main():
     parser.add_argument("-t", "--target", nargs="?")
     parser.add_argument("-c", "--conf-file", nargs="?", default=conf_file)
     parser.add_argument("-r", "--remote-ruleset", action="store_true")
+    parser.add_argument("-u", "--url-prefix", type=str, help="url prefix for rulesets")
     parser.add_argument("-f", "--force-update", action="store_true")
     parser.add_argument("-d", "--duplicate-only", action="store_true")
     parser.add_argument("-n", "--no-backup", action="store_true")
-    parser.add_argument(
-        "-m", "--managed-config-url", type=str, help="managed config url"
-    )
+    parser.add_argument("-m", "--managed-config", action="store_true")
     parser.add_argument(
         "--dry-run", action="store_true", help="Do not save the target file"
     )
@@ -479,9 +490,10 @@ def main():
             source1=conf.source1,
             source2=conf.source2,
             target=conf.target,
+            url_prefix=conf.url_prefix,
             remote_ruleset=args.remote_ruleset,
             force_update=args.force_update,
-            managed_config_url=args.managed_config_url,
+            managed_config=args.managed_config,
             dry_run=args.dry_run,
         )
     if not args.no_backup and not args.dry_run:
