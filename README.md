@@ -1,4 +1,5 @@
 ## Translate surge_config with proxy list to a seperate file
+
 ```shell
 ./translate https://address_to_surge_config_with_proxy_lists > proxy.list
 ```
@@ -27,15 +28,15 @@ After running the first time, a config file will be generated under `$XDG_CONFIG
 {
   "source1": "/path_to_this_repo/profiles/managed/managed_profile.conf",
   "source2": "/path_to_this_repo/profiles/customized.conf",
-  "target": "/path_to_this_repo/profiles/merged.conf"
+  "target": "/path_to_this_repo/profiles/all-in-one.conf"
 }
 ```
 
-By default, the merge command will merge `managed/managed_profile.conf ` with `conf/customized.conf`, and save the result to `conf/merged.conf`.
+By default, the merge command will merge `managed/managed_profile.conf ` with `conf/customized.conf`, and save the result to `conf/all-in-one.conf`.
 
 ```shell
 > ./merge.py
-> cp profiles/merged.conf ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/merged.conf
+> cp profiles/all-in-one.conf ~/Library/Mobile\ Documents/iCloud~com~nssurge~inc/Documents/all-in-one.conf
 ```
 
 A easier way to merge the profile with docker compose
@@ -45,5 +46,5 @@ docker compose run --rm merge
 
 A shell script is also provided for merging the profile with docker
 ```shell
-./merge.sh "https://dler.cloud/subscribe/A57y6psKvMFDxQVRT0IH?surge=smart" merged.conf
+./merge.sh "https://dler.cloud/subscribe/A57y6psKvMFDxQVRT0IH?surge=smart" all-in-one.conf
 ```

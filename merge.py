@@ -13,7 +13,9 @@ from urllib.error import URLError
 from pathlib import Path
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-SURGE_DIR = os.path.expanduser('~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents')
+SURGE_DIR = os.path.expanduser(
+    "~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents"
+)
 URL_PREFIX = "https://raw.githubusercontent.com/leonmax/rules/master"
 
 
@@ -50,11 +52,16 @@ class ManagedProfile:
             print(f"ℹ️  Downloading managed config from {profile.url}. It's forced.")
             profile.download(filename)
         elif time.time() > mtime + profile.interval:
-            print(f"ℹ️  Downloading managed config from {profile.url}. It's older than {profile.interval} secs.")
+            print(
+                f"ℹ️  Downloading managed config from {profile.url}. It's older than {profile.interval} secs."
+            )
             profile.download(filename)
         else:
-            mdatetime = datetime.datetime.strftime(datetime.datetime.fromtimestamp(mtime), "%Y/%m/%m %H:%M:%S")
+            mdatetime = datetime.datetime.strftime(
+                datetime.datetime.fromtimestamp(mtime), "%Y/%m/%m %H:%M:%S"
+            )
             print(f"ℹ️  Managed config is as new as {mdatetime}.")
+
 
 @dataclasses.dataclass
 class ProxyGroup:
@@ -76,17 +83,24 @@ class ProxyGroup:
                 if not value:
                     continue
                 if "=" in value:
-                    k, v = value.split("=",1)
+                    k, v = value.split("=", 1)
                     properties[k] = v
                 else:
                     proxies.append(value)
-            return ProxyGroup(name=m.group("name").strip(), group_type=m.group("group_type"), proxies=proxies, properties=properties)
+            return ProxyGroup(
+                name=m.group("name").strip(),
+                group_type=m.group("group_type"),
+                proxies=proxies,
+                properties=properties,
+            )
         print("failed to parse line: " + line)
         return None
 
     def extend(self, proxy_group):
         if self.name != proxy_group.name:
-            raise Exception(f"⚠️  Cannot extend proxy group {self.name} with {proxy_group.name}")
+            raise Exception(
+                f"⚠️  Cannot extend proxy group {self.name} with {proxy_group.name}"
+            )
         self.proxies.extend(proxy_group.proxies)
         self.properties.update(proxy_group.properties)
 
@@ -104,16 +118,23 @@ class ProxyGroup:
 @dataclasses.dataclass
 class Proxy:
     name: str
-    proxy_type: str  # direct, reject, ssh, http, snell, trojan, ss, comment-or-empty-line
-    host: str|None
+    proxy_type: (
+        str  # direct, reject, ssh, http, snell, trojan, ss, comment-or-empty-line
+    )
+    host: str | None
     port: int
     properties: dict[str, str] = dataclasses.field(default_factory=dict)
 
     @classmethod
     def parse_line(cls, line):
         if line.lstrip().startswith("#") or not line.strip():
-            return Proxy(name=line, proxy_type="comment-or-empty-line", host=None, port=-1)
-        m = re.match(r"^(?P<name>[^=]+)=\s*(?P<proxy_type>[^,]+),\s*(?P<host>[^,]+),\s*(?P<port>[^,]+),\s*(?P<values>.*)", line)
+            return Proxy(
+                name=line, proxy_type="comment-or-empty-line", host=None, port=-1
+            )
+        m = re.match(
+            r"^(?P<name>[^=]+)=\s*(?P<proxy_type>[^,]+),\s*(?P<host>[^,]+),\s*(?P<port>[^,]+),\s*(?P<values>.*)",
+            line,
+        )
         if m:
             properties = {}
             for value in m.group("values").split(","):
@@ -121,9 +142,15 @@ class Proxy:
                 if not value:
                     continue
                 if "=" in value:
-                    k, v = value.split("=",1)
+                    k, v = value.split("=", 1)
                     properties[k] = v
-            return Proxy(name=m.group("name").strip(), proxy_type=m.group("proxy_type"), host=m.group("host"), port=int(m.group("port")), properties=properties)
+            return Proxy(
+                name=m.group("name").strip(),
+                proxy_type=m.group("proxy_type"),
+                host=m.group("host"),
+                port=int(m.group("port")),
+                properties=properties,
+            )
         print("failed to parse line: " + line)
         return None
 
@@ -140,15 +167,19 @@ class Proxy:
 class Item:
     name: str
     config_type: str  # values, comment-or-empty-line
-    values: list[str]|None
+    values: list[str] | None
 
     @classmethod
-    def parse_line(cls, line: str) -> 'Item | None':
+    def parse_line(cls, line: str) -> "Item | None":
         if line.lstrip().startswith("#") or not line.strip():
             return Item(name=line, config_type="comment-or-empty-line", values=None)
         m = re.match(r"^(?P<name>[^=]+)=\s*(?P<values>.*)", line)
         if m:
-            return Item(name=m.group("name").strip(), config_type="values", values=m.group("values").split(","))
+            return Item(
+                name=m.group("name").strip(),
+                config_type="values",
+                values=m.group("values").split(","),
+            )
         print("failed to parse line: " + line)
         return None
 
@@ -190,7 +221,9 @@ class SurgeProfile:
         self._managed_config = None
 
     def add_managed_line(self, url, interval=86400, strict=False):
-        self._managed_config = f"#!MANAGED-CONFIG {url} interval={interval} strict={strict}\n"
+        self._managed_config = (
+            f"#!MANAGED-CONFIG {url} interval={interval} strict={strict}\n"
+        )
 
     def save(self, as_file=None):
         _file = as_file or self._file
@@ -223,7 +256,7 @@ class SurgeProfile:
         for line in lines:
             new_item = item_class.parse_line(line)
             if new_item and new_item.name in items:
-                if hasattr(new_item, 'extend'):
+                if hasattr(new_item, "extend"):
                     new_item.extend(items[new_item.name])
                 else:
                     items[new_item.name].values = new_item.values
@@ -249,24 +282,32 @@ class SurgeProfile:
         else:
             self.prepend_to_section(section_name, lines)
 
-
     def prepend_to_section(self, section_name, lines):
         if section_name not in self._sections:
             self._section_names.append(section_name)
             self._sections[section_name] = lines
         else:
-            self._sections[section_name][0:0] = ["# region: Customized\n"] + lines + ["# endregion: Customized\n"]
+            self._sections[section_name][0:0] = (
+                ["# region: Customized\n"] + lines + ["# endregion: Customized\n"]
+            )
 
     @property
     def section_names(self):
         return self._section_names
 
 
-def merge(source1: str, source2: str, target: str, remote_ruleset = True, force_update: bool = False, dry_run: bool = False):
+def merge(
+    source1: str,
+    source2: str,
+    target: str,
+    remote_ruleset=True,
+    force_update: bool = False,
+    dry_run: bool = False,
+):
     if source1.startswith("https://"):
         print(f'ℹ️  Downloading managed profile from "{source1}"')
-        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as tmp:
-           ManagedProfile(url=source1, interval=0, strict=True).download(tmp.name)
+        with tempfile.NamedTemporaryFile(mode="w+", delete=False) as tmp:
+            ManagedProfile(url=source1, interval=0, strict=True).download(tmp.name)
         source1 = tmp.name
     else:
         ManagedProfile.reload(source1, force_update)
@@ -288,7 +329,9 @@ def merge(source1: str, source2: str, target: str, remote_ruleset = True, force_
         if section_name:
             len1 = len(profile1.get_section(section_name))
             len2 = len(profile2.get_section(section_name))
-            print(f"ℹ️  Merging section [{section_name}]: {len1} + {len2} => {len1 + len2}")
+            print(
+                f"ℹ️  Merging section [{section_name}]: {len1} + {len2} => {len1 + len2}"
+            )
             lines = profile2.get_section(section_name)
             # 转换本地路径为 HTTPS URL
             if section_name == "Rule" and remote_ruleset:
@@ -309,8 +352,7 @@ def merge(source1: str, source2: str, target: str, remote_ruleset = True, force_
 
 def convert_local_path_to_http(line):
     if line.startswith("RULE-SET,") and not (
-            line.startswith("RULE-SET,https://") or
-            line.startswith("RULE-SET,SYSTEM")
+        line.startswith("RULE-SET,https://") or line.startswith("RULE-SET,SYSTEM")
     ):
         parts = line.split(",")
         local_path = parts[1].strip()
@@ -332,7 +374,9 @@ def copy_referenced_files(source_folder, target_folder):
                     print(f"⚠️  Skipping copy of {item} to itself.")
                 else:
                     if target_file.exists():
-                        print(f"⚠️  File {target_file} already exists and will be overwritten.")
+                        print(
+                            f"⚠️  File {target_file} already exists and will be overwritten."
+                        )
                     shutil.copy(item, target_file)
 
 
@@ -348,7 +392,7 @@ def get_path_from_user(path_name: str, default_path: str = None) -> str:
 
 def backup(original_path):
     filename = datetime.datetime.now().strftime("bk-%Y-%m-%d.conf")
-    backup_path = Path(CURRENT_DIR) / 'profiles' / filename
+    backup_path = Path(CURRENT_DIR) / "profiles" / filename
     backup_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f'ℹ️  Backing up "{original_path}" to "{backup_path}"')
@@ -368,12 +412,18 @@ def configure(args):
         print(f"ℹ️  No config ({args.conf_file}) exists, let's configure")
 
         conf = Config(
-            source1=args.source1 or get_path_from_user(
-                "source config 1", default_path=f"{ SURGE_DIR }/subs/Dler Cloud.conf"),
-            source2=args.source2 or get_path_from_user(
-                "source config 2", default_path=f"{ CURRENT_DIR }/customized.dconf"),
-            target=args.target or get_path_from_user(
-                "target config", default_path=f"{ SURGE_DIR }/merged.conf")
+            source1=args.source1
+            or get_path_from_user(
+                "source config 1", default_path=f"{ SURGE_DIR }/subs/Dler Cloud.conf"
+            ),
+            source2=args.source2
+            or get_path_from_user(
+                "source config 2", default_path=f"{ CURRENT_DIR }/customized.dconf"
+            ),
+            target=args.target
+            or get_path_from_user(
+                "target config", default_path=f"{ SURGE_DIR }/all-in-one.conf"
+            ),
         )
 
         print(f"ℹ️  Saving config to {args.conf_file}")
@@ -385,12 +435,13 @@ def configure(args):
         conf = Config(
             source1=args.source1 or conf.source1,
             source2=args.source2 or conf.source2,
-            target=args.target or conf.target)
+            target=args.target or conf.target,
+        )
     return conf
 
 
 def default_conf_file():
-    config_dir = os.getenv('XDG_CONFIG_HOME') or '~/.config'
+    config_dir = os.getenv("XDG_CONFIG_HOME") or "~/.config"
     conf_path = Path(config_dir).expanduser() / "nssurge" / "config.json"
     conf_path.parent.mkdir(parents=True, exist_ok=True)
     return conf_path
@@ -400,15 +451,17 @@ def main():
     conf_file = default_conf_file()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("source1", nargs='?')
-    parser.add_argument("source2", nargs='?')
-    parser.add_argument("-t", "--target", nargs='?')
-    parser.add_argument("-c", "--conf-file", nargs='?', default=conf_file)
+    parser.add_argument("source1", nargs="?")
+    parser.add_argument("source2", nargs="?")
+    parser.add_argument("-t", "--target", nargs="?")
+    parser.add_argument("-c", "--conf-file", nargs="?", default=conf_file)
     parser.add_argument("-r", "--remote-ruleset", action="store_true")
     parser.add_argument("-f", "--force-update", action="store_true")
     parser.add_argument("-d", "--duplicate-only", action="store_true")
     parser.add_argument("-n", "--no-backup", action="store_true")
-    parser.add_argument("--dry-run", action="store_true", help="Do not save the target file")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Do not save the target file"
+    )
     args = parser.parse_args()
 
     conf = configure(args)
@@ -421,10 +474,11 @@ def main():
             target=conf.target,
             remote_ruleset=args.remote_ruleset,
             force_update=args.force_update,
-            dry_run=args.dry_run
+            dry_run=args.dry_run,
         )
     if not args.no_backup and not args.dry_run:
         backup(conf.target)
+
 
 if __name__ == "__main__":
     main()
