@@ -220,7 +220,7 @@ class SurgeProfile:
     def remove_managed_line(self):
         self._managed_config = None
 
-    def add_managed_line(self, url, interval=86400, strict=False):
+    def set_managed_line(self, url, interval=86400, strict=False):
         self._managed_config = (
             f"#!MANAGED-CONFIG {url} interval={interval} strict={strict}\n"
         )
@@ -303,6 +303,7 @@ def merge(
     target: str,
     remote_ruleset=True,
     force_update: bool = False,
+    managed_config_url: str = None,
     dry_run: bool = False,
 ):
     if source1.startswith("https://"):
@@ -343,6 +344,8 @@ def merge(
     if not dry_run:
         print(f'ℹ️  Saving to "{target}"')
         profile1.remove_managed_line()
+        if managed_config_url:
+            profile1.set_managed_line(url=managed_config_url)
         profile1.save(as_file=target)
         if not remote_ruleset:
             # 复制 ruleset 文件夹到终点
@@ -461,6 +464,9 @@ def main():
     parser.add_argument("-d", "--duplicate-only", action="store_true")
     parser.add_argument("-n", "--no-backup", action="store_true")
     parser.add_argument(
+        "-m", "--managed-config-url", type=str, help="managed config url"
+    )
+    parser.add_argument(
         "--dry-run", action="store_true", help="Do not save the target file"
     )
     args = parser.parse_args()
@@ -475,6 +481,7 @@ def main():
             target=conf.target,
             remote_ruleset=args.remote_ruleset,
             force_update=args.force_update,
+            managed_config_url=args.managed_config_url,
             dry_run=args.dry_run,
         )
     if not args.no_backup and not args.dry_run:
