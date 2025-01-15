@@ -16,7 +16,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 SURGE_DIR = os.path.expanduser(
     "~/Library/Mobile Documents/iCloud~com~nssurge~inc/Documents"
 )
-DEFAULT_URL_PREFIX = "https://raw.githubusercontent.com/leonmax/surge/main"
+DEFAULT_URL_PREFIX = "https://raw.githubusercontent.com/leonmax/surge/refs/heads/main"
 
 
 @dataclasses.dataclass
