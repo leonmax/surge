@@ -3,3 +3,4 @@ bk-*
 icloud
 merged.conf
 all-in-one.conf
+.env
