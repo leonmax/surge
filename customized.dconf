@@ -33,7 +33,7 @@ Spotify    = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, �
 Asian TV   = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
 Global TV  = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
 Apple      = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0, test-url=https://www.apple.com/
-Apple TV   = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
+Apple TV   = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0
 # Chat
 Telegram   = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=0
 Google FCM = select, Switch, 🇺🇸US, 🇨🇦CA, 🇸🇬SG, 🇯🇵JP, 🇰🇷KR, 🇭🇰HK, 🏝️TW, hidden=1
